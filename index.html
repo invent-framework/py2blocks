@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Invent</title>
+
+    <!-- Recommended meta tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.1/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2024.10.1/core.js"></script>
+    <style>
+    body {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+    a, a:visited {
+      color: #004dcc;
+    }
+    h2 {
+      color: #0000008a;
+    }
+    </style>
+</head>
+<body>
+  <py-config>
+    {
+        "files":{
+            "./static/test_suite.tar.gz": "./*",
+            "https://raw.githubusercontent.com/ntoll/upytest/main/upytest.py": "",
+            "https://raw.githubusercontent.com/ntoll/umock/main/umock.py": ""
+        }
+    }
+  </py-config>
+  <div style="margin: auto; width: 85%" id="main">
+    <p>Running test suite in a worker with Pyodide:</p>
+    <script type="py" src="./static/main.py" terminal worker></script>
+  </div>
+</body>
