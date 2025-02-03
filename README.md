@@ -26,3 +26,22 @@ That's it!
 
 We expect folks to contribute and collaborate in the spirit of our
 [Care of Community](./CODE_OF_CONDUCT.md) statement.
+
+## Available blocks
+
+In the JSON representation of block, each block has a `type` whose name relates
+to the matching Python `ast` node type. Depending on the type of block, they
+may contain other attributes and blocks as defined below:
+
+* `FunctionDef` (see: 
+  [FunctionDef](https://docs.python.org/3/library/ast.html#ast.FunctionDef)):
+  - `fields.name` - the name of the function.
+  - `inputs.body` - blocks representing the body of the function.
+* `Pass` (see: [Pass](https://docs.python.org/3/library/ast.html#ast.Pass)):
+  None.
+* `Return` (see: 
+  [Return](https://docs.python.org/3/library/ast.html#ast.Return)):
+  - `inputs.value.block` - the blocks that derive the return value.
+* `int` (see: 
+  [Constant](https://docs.python.org/3/library/ast.html#ast.Constant)):
+  - `fields.value` - the integer value.

@@ -13,6 +13,7 @@ https://developers.google.com/blockly/guides/configure/web/serialization
 
 import ast
 import json
+import numbers
 
 
 def py2blocks(code):
@@ -25,10 +26,23 @@ def py2blocks(code):
     Returns:
         str: The Blockly JSON representation of the Python code.
     """
-    # Parse the Python code into an AST.
-    tree = ast.parse(code)
-    # Traverse the AST to generate the Blockly JSON.
-    return json.dumps(traverse(tree))
+    try:
+        # Parse the Python code into an AST.
+        tree = ast.parse(code)
+        # Traverse the AST to generate the Blockly JSON.
+        return json.dumps(traverse(tree))
+    except SyntaxError as e:
+        # Return some helpful context for the syntax error.
+        context = {
+            "lineno": e.lineno,
+            "offset": e.offset,
+            "text": e.text,
+            "message": e.msg,
+        }
+        return json.dumps({"error": context})
+    except Exception as e:
+        # Catch all for all other errors.
+        return json.dumps({"error": str(e)})
 
 
 def traverse(tree):
@@ -42,11 +56,15 @@ def traverse(tree):
         dict: The Blockly JSON representation of the AST.
     """
     # The root of the Blockly JSON.
-    blocks = {"type": "root", "children": []}
+    blocks = {
+        "blocks": [],
+    }
     # Traverse the AST and generate the Blockly JSON.
     for node in tree.body:
-        blocks["children"].append(traverse_node(node))
-    return blocks
+        blocks["blocks"].append(traverse_node(node))
+    return {
+        "blocks": blocks,
+    }
 
 
 def traverse_node(node):
@@ -60,12 +78,48 @@ def traverse_node(node):
         dict: The Blockly JSON representation of the node.
     """
     # The Blockly JSON representation of the node.
-    block = {"type": "statement", "children": []}
+    block = {
+        "type": type(node).__name__,
+        # Add other global attributes here.
+    }
     # Traverse the node and generate the Blockly JSON.
     if isinstance(node, ast.FunctionDef):
-        block["type"] = "function"
-        block["name"] = node.name
-        block["children"] = [traverse_node(n) for n in node.body]
+        """
+        {
+            "type": "procedures_defreturn",
+            "fields": {
+                "name": "my_func"
+            },
+            "inputs": {
+                "body": {
+                  ...
+                }
+            },
+        }
+        """
+        block["fields"] = {"name": node.name}
+        block["inputs"] = {"body": {}}
+        for n in node.body:
+            block["inputs"]["body"]["block"] = traverse_node(n)
+    elif isinstance(node, ast.Return):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+    elif isinstance(node, ast.Constant):
+        if isinstance(node.value, numbers.Number):
+            block["type"] = type(node.value).__name__
+            block["fields"] = {"value": node.value}
+        elif isinstance(node.value, str):
+            block["type"] = "str"
+            block["fields"] = {"value": node.value}
+        elif isinstance(node.value, bool):
+            block["type"] = "bool"
+            block["fields"] = {"value": node.value}
+        elif node.value is None:
+            block["type"] = "none"
+    return block
     """
     elif isinstance(node, ast.Assign):
         block["type"] = "assign"
