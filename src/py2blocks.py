@@ -67,15 +67,21 @@ def traverse(tree):
     }
 
 
+def traverse_body(body):
+    """
+    Traverse the body of a node in the AST and generate the Blockly JSON.
+    """
+    node = body[0]
+    the_rest = body[1:]
+    block = traverse_node(node)
+    if the_rest:
+        block["next"] = traverse_body(the_rest) if the_rest else None
+    return block
+
+
 def traverse_node(node):
     """
     Traverse a node in the AST and generate the Blockly JSON.
-
-    Args:
-        node (ast.AST): The node to traverse.
-
-    Returns:
-        dict: The Blockly JSON representation of the node.
     """
     # The Blockly JSON representation of the node.
     block = {
@@ -84,23 +90,13 @@ def traverse_node(node):
     }
     # Traverse the node and generate the Blockly JSON.
     if isinstance(node, ast.FunctionDef):
-        """
-        {
-            "type": "procedures_defreturn",
-            "fields": {
-                "name": "my_func"
-            },
-            "inputs": {
-                "body": {
-                  ...
-                }
-            },
-        }
-        """
         block["fields"] = {"name": node.name}
+        if node.args.args:
+            block["fields"]["args"] = [arg.arg for arg in node.args.args]
         block["inputs"] = {"body": {}}
-        for n in node.body:
-            block["inputs"]["body"]["block"] = traverse_node(n)
+        body = traverse_body(node.body)
+        if body:
+            block["inputs"]["body"]["block"] = body
     elif isinstance(node, ast.Return):
         block["inputs"] = {
             "value": {
@@ -108,23 +104,35 @@ def traverse_node(node):
             },
         }
     elif isinstance(node, ast.Constant):
-        if isinstance(node.value, numbers.Number):
-            block["type"] = type(node.value).__name__
-            block["fields"] = {"value": node.value}
-        elif isinstance(node.value, str):
-            block["type"] = "str"
-            block["fields"] = {"value": node.value}
-        elif isinstance(node.value, bool):
-            block["type"] = "bool"
-            block["fields"] = {"value": node.value}
-        elif node.value is None:
-            block["type"] = "none"
-    return block
-    """
+        block["type"] = type(node.value).__name__
+        block["fields"] = {"value": node.value}
     elif isinstance(node, ast.Assign):
-        block["type"] = "assign"
-        block["targets"] = [traverse_node(n) for n in node.targets]
-        block["value"] = traverse_node(node.value)
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+        block["fields"] = {"id": node.targets[0].id}
+    elif isinstance(node, ast.AugAssign):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+        block["fields"] = {"id": node.target.id}
+    elif isinstance(node, ast.Name):
+        block["fields"] = {"id": node.id}
+    elif isinstance(node, ast.BinOp):
+        block["inputs"] = {
+            "left": {
+                "block": traverse_node(node.left),
+            },
+            "right": {
+                "block": traverse_node(node.right),
+            },
+        }
+        block["fields"] = {"op": type(node.op).__name__}
+    """
     elif isinstance(node, ast.Expr):
         block["type"] = "expr"
         block["value"] = traverse_node(node.value)
@@ -163,3 +171,4 @@ def traverse_node(node):
         block["type"] = "usub"
     return block
     """
+    return block
