@@ -214,3 +214,63 @@ async def test_function_with_args_with_body_with_return():
             ]
         }
     }, result
+
+
+async def test_function_inside_another_function():
+    """
+    Ensure that a function inside another function is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "def outer_function():\n    def inner_function():\n        return 1\n    return inner_function"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_function_inside_another_function", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "FunctionDef",
+                    "fields": {"name": "outer_function"},
+                    "inputs": {
+                        "body": {
+                            "block": {
+                                "type": "FunctionDef",
+                                "fields": {"name": "inner_function"},
+                                "inputs": {
+                                    "body": {
+                                        "block": {
+                                            "type": "Return",
+                                            "inputs": {
+                                                "value": {
+                                                    "block": {
+                                                        "type": "int",
+                                                        "fields": {"value": 1},
+                                                    }
+                                                }
+                                            },
+                                        }
+                                    }
+                                },
+                                "next": {
+                                    "block": {
+                                        "type": "Return",
+                                        "inputs": {
+                                            "value": {
+                                                "block": {
+                                                    "type": "Name",
+                                                    "fields": {
+                                                        "var": {
+                                                            "name": "inner_function"
+                                                        }
+                                                    },
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
