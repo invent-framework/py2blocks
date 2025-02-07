@@ -13,7 +13,8 @@ def render_blocks(id, result):
     workspace_container.className = "blockly"
     document.body.appendChild(workspace_container)
     workspace = window.Blockly.inject(
-        workspace_container, {"renderer": "zelos", "theme": "py2blocks", "scrollbars": True}
+        workspace_container,
+        {"renderer": "zelos", "theme": "py2blocks", "scrollbars": True},
     )
     window.Blockly.serialization.workspaces.load(result, workspace)
     window.workspace = workspace
@@ -125,7 +126,9 @@ async def test_function_no_args_with_body_with_return():
                                             "value": {
                                                 "block": {
                                                     "type": "Name",
-                                                    "fields": {"var": {"name": "x"}},
+                                                    "fields": {
+                                                        "var": {"name": "x"}
+                                                    },
                                                 }
                                             }
                                         },
@@ -172,7 +175,11 @@ async def test_function_with_args_with_body_with_return():
                                                 "left": {
                                                     "block": {
                                                         "type": "Name",
-                                                        "fields": {"var": {"name": "x"}},
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "x"
+                                                            }
+                                                        },
                                                     }
                                                 },
                                                 "right": {
@@ -192,7 +199,9 @@ async def test_function_with_args_with_body_with_return():
                                             "value": {
                                                 "block": {
                                                     "type": "Name",
-                                                    "fields": {"var": {"name": "y"}},
+                                                    "fields": {
+                                                        "var": {"name": "y"}
+                                                    },
                                                 }
                                             }
                                         },
