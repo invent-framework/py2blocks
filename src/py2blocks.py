@@ -133,6 +133,33 @@ def traverse_node(node):
             },
         }
         block["fields"] = {"op": type(node.op).__name__}
+    elif isinstance(node, ast.BoolOp):
+        # If there are two values, just use value[0] as left and value[1] as
+        # right input.
+        # If there are more than two values, use value[0] as left and create a
+        # new ast.BoolOp (with the remaining values), as the right input.
+        if len(node.values) == 2:
+            block["inputs"] = {
+                "left": {
+                    "block": traverse_node(node.values[0]),
+                },
+                "right": {
+                    "block": traverse_node(node.values[1]),
+                },
+            }
+        else:
+            block["inputs"] = {
+                "left": {
+                    "block": traverse_node(node.values[0]),
+                },
+                "right": {
+                    "block": traverse_node(
+                        ast.BoolOp(op=node.op, values=node.values[1:])
+                    ),
+                },
+            }
+        block["fields"] = {"op": type(node.op).__name__}
+
     """
     elif isinstance(node, ast.Expr):
         block["type"] = "expr"
@@ -142,34 +169,8 @@ def traverse_node(node):
         block["func"] = traverse_node(node.func)
         block["args"] = [traverse_node(a) for a in node.args]
         block["keywords"] = [traverse_node(k) for k in node.keywords]
-    elif isinstance(node, ast.Name):
-        block["type"] = "name"
-        block["id"] = node.id
-    elif isinstance(node, ast.Str):
-        block["type"] = "str"
-        block["s"] = node.s
-    elif isinstance(node, ast.Num):
-        block["type"] = "num"
-        block["n"] = node.n
-    elif isinstance(node, ast.BinOp):
-        block["type"] = "binop"
-        block["left"] = traverse_node(node.left)
-        block["op"] = traverse_node(node.op)
-        block["right"] = traverse_node(node.right)
-    elif isinstance(node, ast.Add):
-        block["type"] = "add"
-    elif isinstance(node, ast.Sub):
-        block["type"] = "sub"
-    elif isinstance(node, ast.Mult):
-        block["type"] = "mult"
-    elif isinstance(node, ast.Div):
-        block["type"] = "div"
-    elif isinstance(node, ast.Mod):
-        block["type"] = "mod"
-    elif isinstance(node, ast.Pow):
-        block["type"] = "pow"
     elif isinstance(node, ast.USub):
-        block["type"] = "usub"
+        pass
     return block
     """
     return block

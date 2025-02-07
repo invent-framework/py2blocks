@@ -278,3 +278,74 @@ async def test_function_inside_another_function():
             ]
         }
     }, result
+
+
+async def test_bool_op():
+    """
+    Ensure that a boolean operation is converted to Blockly JSON correctly.
+    """
+    python_code = "def test_function():\n    return True and False and True"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected bool_op block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "FunctionDef",
+                    "fields": {"name": "test_function"},
+                    "inputs": {
+                        "body": {
+                            "block": {
+                                "type": "Return",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "BoolOp",
+                                            "inputs": {
+                                                "left": {
+                                                    "block": {
+                                                        "type": "bool",
+                                                        "fields": {
+                                                            "value": True
+                                                        },
+                                                    }
+                                                },
+                                                "right": {
+                                                    "block": {
+                                                        "type": "BoolOp",
+                                                        "inputs": {
+                                                            "left": {
+                                                                "block": {
+                                                                    "type": "bool",
+                                                                    "fields": {
+                                                                        "value": False
+                                                                    },
+                                                                }
+                                                            },
+                                                            "right": {
+                                                                "block": {
+                                                                    "type": "bool",
+                                                                    "fields": {
+                                                                        "value": True
+                                                                    },
+                                                                }
+                                                            },
+                                                        },
+                                                        "fields": {
+                                                            "op": "And"
+                                                        },
+                                                    }
+                                                },
+                                            },
+                                            "fields": {"op": "And"},
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
