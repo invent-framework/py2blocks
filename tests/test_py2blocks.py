@@ -4,16 +4,20 @@ Test suite for py2blocks.
 
 import py2blocks
 import json
-from pyscript import window, document
+from pyscript import window
+from pyscript.web import page, div
 
 
 def render_blocks(id, result):
-    workspace_container = document.createElement("div")
-    workspace_container.id = id
-    workspace_container.className = "blockly"
-    document.body.appendChild(workspace_container)
+    """
+    Add a Blockly workspace to the DOM, with the given id, and render the
+    blocks relating to the result of the conversion.
+    """
+    workspace_container = div(id=id)
+    workspace_container.classes.add("blockly")
+    page.append(workspace_container)
     workspace = window.Blockly.inject(
-        workspace_container,
+        workspace_container.id,
         {"renderer": "zelos", "theme": "py2blocks", "scrollbars": True},
     )
     window.Blockly.serialization.workspaces.load(result, workspace)
