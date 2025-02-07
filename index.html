@@ -9,6 +9,16 @@
 
     <link rel="stylesheet" href="https://pyscript.net/releases/2024.10.1/core.css" />
     <script type="module" src="https://pyscript.net/releases/2024.10.1/core.js"></script>
+
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+
+    <!-- Blocks -->
+    <script src="/src/blocks/theme.js"></script>
+    <script src="/src/blocks/common/definitions.js"></script>
+    <script src="/src/blocks/functions/definitions.js"></script>
+    <script src="/src/blocks/variables/definitions.js"></script>
+    <script src="/src/blocks/math/definitions.js"></script>
+
     <style>
     body {
       font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -18,6 +28,15 @@
     }
     h2 {
       color: #0000008a;
+    }
+    .blockly {
+      height: 200px; width: 100%; margin-top: 1rem;
+    }
+    .blocklyText {
+      fill: black !important;
+    }
+    .zelos-renderer.py2blocks-theme .blocklyDropdownText {
+      fill: black !important;
     }
     </style>
 </head>
