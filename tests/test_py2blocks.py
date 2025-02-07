@@ -4,6 +4,19 @@ Test suite for py2blocks.
 
 import py2blocks
 import json
+from pyscript import window, document
+
+
+def render_blocks(id, result):
+    workspace_container = document.createElement("div")
+    workspace_container.id = id
+    workspace_container.className = "blockly"
+    document.body.appendChild(workspace_container)
+    workspace = window.Blockly.inject(
+        workspace_container, {"renderer": "zelos", "theme": "py2blocks", "scrollbars": True}
+    )
+    window.Blockly.serialization.workspaces.load(result, workspace)
+    window.workspace = workspace
 
 
 async def test_with_syntax_error():
@@ -29,6 +42,7 @@ async def test_function_no_args_no_body_no_return():
     """
     python_code = "def test_function():\n    pass"
     result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_function_no_args_no_body_no_return", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -49,6 +63,7 @@ async def test_function_no_args_no_body_with_return():
     """
     python_code = "def test_function():\n    return 1"
     result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_function_no_args_no_body_with_return", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -83,6 +98,7 @@ async def test_function_no_args_with_body_with_return():
     """
     python_code = "def test_function():\n    x = 1\n    return x"
     result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_function_no_args_with_body_with_return", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -93,7 +109,7 @@ async def test_function_no_args_with_body_with_return():
                         "body": {
                             "block": {
                                 "type": "Assign",
-                                "fields": {"id": "x"},
+                                "fields": {"var": {"name": "x"}},
                                 "inputs": {
                                     "value": {
                                         "block": {
@@ -103,15 +119,17 @@ async def test_function_no_args_with_body_with_return():
                                     }
                                 },
                                 "next": {
-                                    "type": "Return",
-                                    "inputs": {
-                                        "value": {
-                                            "block": {
-                                                "type": "Name",
-                                                "fields": {"id": "x"},
+                                    "block": {
+                                        "type": "Return",
+                                        "inputs": {
+                                            "value": {
+                                                "block": {
+                                                    "type": "Name",
+                                                    "fields": {"var": {"name": "x"}},
+                                                }
                                             }
-                                        }
-                                    },
+                                        },
+                                    }
                                 },
                             }
                         }
@@ -130,7 +148,8 @@ async def test_function_with_args_with_body_with_return():
     python_code = "def test_function(x):\n    y = x + 1\n    return y"
     raw = py2blocks.py2blocks(python_code)
     result = json.loads(raw)
-    expected = {
+    render_blocks("test_function_with_args_with_body_with_return", result)
+    assert result == {
         "blocks": {
             "blocks": [
                 {
@@ -143,7 +162,7 @@ async def test_function_with_args_with_body_with_return():
                         "body": {
                             "block": {
                                 "type": "Assign",
-                                "fields": {"id": "y"},
+                                "fields": {"var": {"name": "y"}},
                                 "inputs": {
                                     "value": {
                                         "block": {
@@ -153,7 +172,7 @@ async def test_function_with_args_with_body_with_return():
                                                 "left": {
                                                     "block": {
                                                         "type": "Name",
-                                                        "fields": {"id": "x"},
+                                                        "fields": {"var": {"name": "x"}},
                                                     }
                                                 },
                                                 "right": {
@@ -167,14 +186,16 @@ async def test_function_with_args_with_body_with_return():
                                     }
                                 },
                                 "next": {
-                                    "type": "Return",
-                                    "inputs": {
-                                        "value": {
-                                            "block": {
-                                                "type": "Name",
-                                                "fields": {"id": "y"},
+                                    "block": {
+                                        "type": "Return",
+                                        "inputs": {
+                                            "value": {
+                                                "block": {
+                                                    "type": "Name",
+                                                    "fields": {"var": {"name": "y"}},
+                                                }
                                             }
-                                        }
+                                        },
                                     },
                                 },
                             }
@@ -183,7 +204,4 @@ async def test_function_with_args_with_body_with_return():
                 }
             ]
         }
-    }
-    assert (
-        result == expected
-    ), f"\n{raw}\nDoesn't equal\n{json.dumps(expected)}"
+    }, result

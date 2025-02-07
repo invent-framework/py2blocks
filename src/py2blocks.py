@@ -13,7 +13,6 @@ https://developers.google.com/blockly/guides/configure/web/serialization
 
 import ast
 import json
-import numbers
 
 
 def py2blocks(code):
@@ -75,7 +74,9 @@ def traverse_body(body):
     the_rest = body[1:]
     block = traverse_node(node)
     if the_rest:
-        block["next"] = traverse_body(the_rest) if the_rest else None
+        block["next"] = (
+            {"block": traverse_body(the_rest)} if the_rest else None
+        )
     return block
 
 
@@ -112,16 +113,16 @@ def traverse_node(node):
                 "block": traverse_node(node.value),
             },
         }
-        block["fields"] = {"id": node.targets[0].id}
+        block["fields"] = {"var": {"name": node.targets[0].id}}
     elif isinstance(node, ast.AugAssign):
         block["inputs"] = {
             "value": {
                 "block": traverse_node(node.value),
             },
         }
-        block["fields"] = {"id": node.target.id}
+        block["fields"] = {"var": {"name": node.target.id}}
     elif isinstance(node, ast.Name):
-        block["fields"] = {"id": node.id}
+        block["fields"] = {"var": {"name": node.id}}
     elif isinstance(node, ast.BinOp):
         block["inputs"] = {
             "left": {
