@@ -174,3 +174,4 @@ cython_debug/
 *.tgz
 *.tar.gz
 static/test_suite.tar.gz
+static/py2blocks.tar.gz
