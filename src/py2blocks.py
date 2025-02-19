@@ -90,7 +90,9 @@ def traverse_node(node):
         # Add other global attributes here.
     }
     # Traverse the node and generate the Blockly JSON.
-    if isinstance(node, ast.FunctionDef):
+    if node is None:
+        return node
+    elif isinstance(node, ast.FunctionDef):
         block["fields"] = {"name": node.name}
         if node.args.args:
             block["fields"]["args"] = [arg.arg for arg in node.args.args]
@@ -107,6 +109,21 @@ def traverse_node(node):
     elif isinstance(node, ast.Constant):
         block["type"] = type(node.value).__name__
         block["fields"] = {"value": node.value}
+    elif isinstance(node, ast.Expr):
+        block = traverse_node(node.value)
+    elif isinstance(node, ast.FormattedValue):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+            "format_spec": traverse_node(node.format_spec),
+        }
+    elif isinstance(node, ast.JoinedStr):
+        # TODO: Implement JoinedStr properly as an f-string block later.
+        # For now, just treat it as an ast.Str, but keep the type as-is so
+        # the blocks know it's an f-string.
+        values = [traverse_node(value) for value in node.values]
+        block["fields"] = {"value": values}
     elif isinstance(node, ast.Assign):
         block["inputs"] = {
             "value": {

@@ -349,3 +349,66 @@ async def test_bool_op():
             ]
         }
     }, result
+
+
+async def test_joinedstr():
+    """
+    The JoinedStr AST node is used to represent f-strings. Ensure that a simple
+    f-string is converted to Blockly JSON correctly.
+    """
+    python_code = "f'Hello {name} from Python {x:3}'"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "JoinedStr",
+                    "fields": {
+                        "value": [
+                            {"type": "str", "fields": {"value": "Hello "}},
+                            {
+                                "type": "FormattedValue",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "name"}
+                                            },
+                                        }
+                                    },
+                                    "format_spec": None,
+                                },
+                            },
+                            {
+                                "type": "str",
+                                "fields": {"value": " from Python "},
+                            },
+                            {
+                                "type": "FormattedValue",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "format_spec": {
+                                        "type": "JoinedStr",
+                                        "fields": {
+                                            "value": [
+                                                {
+                                                    "type": "str",
+                                                    "fields": {"value": "3"},
+                                                }
+                                            ]
+                                        },
+                                    },
+                                },
+                            },
+                        ]
+                    },
+                }
+            ]
+        }
+    }, result
