@@ -6,6 +6,7 @@ import py2blocks
 import json
 from pyscript import window
 from pyscript.web import page, div
+import upytest
 
 
 def render_blocks(id, result):
@@ -409,6 +410,282 @@ async def test_joinedstr():
                         ]
                     },
                 }
+            ]
+        }
+    }, result
+
+
+async def test_list():
+    """
+    Ensure that a list is converted to Blockly JSON correctly.
+    """
+    python_code = '["a", "b", "c"]'
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "List",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {"type": "str", "fields": {"value": "a"}}
+                        },
+                        "input_000002": {
+                            "block": {"type": "str", "fields": {"value": "b"}}
+                        },
+                        "input_000003": {
+                            "block": {"type": "str", "fields": {"value": "c"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_tuple():
+    """
+    Ensure that a tuple is converted to Blockly JSON correctly.
+    """
+    python_code = '("a", "b", "c")'
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Tuple",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {"type": "str", "fields": {"value": "a"}}
+                        },
+                        "input_000002": {
+                            "block": {"type": "str", "fields": {"value": "b"}}
+                        },
+                        "input_000003": {
+                            "block": {"type": "str", "fields": {"value": "c"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_set():
+    """
+    Ensure that a set is converted to Blockly JSON correctly.
+    """
+    python_code = '{"a", "b", "c"}'
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Set",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {"type": "str", "fields": {"value": "a"}}
+                        },
+                        "input_000002": {
+                            "block": {"type": "str", "fields": {"value": "b"}}
+                        },
+                        "input_000003": {
+                            "block": {"type": "str", "fields": {"value": "c"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_dict():
+    """
+    Ensure that a dict is converted to Blockly JSON correctly.
+    """
+    python_code = '{"a": 1, "b": 2, "c": 3}'
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Dict",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "shadow": {
+                                "type": "dict_item",
+                                "inputs": {
+                                    "key": {
+                                        "block": {
+                                            "type": "str",
+                                            "fields": {"value": "a"},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "input_000002": {
+                            "shadow": {
+                                "type": "dict_item",
+                                "inputs": {
+                                    "key": {
+                                        "block": {
+                                            "type": "str",
+                                            "fields": {"value": "b"},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "input_000003": {
+                            "shadow": {
+                                "type": "dict_item",
+                                "inputs": {
+                                    "key": {
+                                        "block": {
+                                            "type": "str",
+                                            "fields": {"value": "c"},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 3},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_dict_with_pompoms_to_unpack():
+    """
+    Ensure that a dict as {"a": 1, **foo} is converted to Blockly JSON
+    correctly. I.e. the **foo is destructured into individual items.
+    """
+    python_code = 'd = {"a": 1}\nd2 = {"b": 2, **d}'
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Assign",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Dict",
+                                "extraState": {"items": 1},
+                                "inputs": {
+                                    "input_000001": {
+                                        "shadow": {
+                                            "type": "dict_item",
+                                            "inputs": {
+                                                "key": {
+                                                    "block": {
+                                                        "type": "str",
+                                                        "fields": {
+                                                            "value": "a"
+                                                        },
+                                                    }
+                                                },
+                                                "value": {
+                                                    "block": {
+                                                        "type": "int",
+                                                        "fields": {"value": 1},
+                                                    }
+                                                },
+                                            },
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    },
+                    "fields": {"var": {"name": "d"}},
+                },
+                {
+                    "type": "Assign",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Dict",
+                                "extraState": {"items": 2},
+                                "inputs": {
+                                    "input_000001": {
+                                        "shadow": {
+                                            "type": "dict_item",
+                                            "inputs": {
+                                                "key": {
+                                                    "block": {
+                                                        "type": "str",
+                                                        "fields": {
+                                                            "value": "b"
+                                                        },
+                                                    }
+                                                },
+                                                "value": {
+                                                    "block": {
+                                                        "type": "int",
+                                                        "fields": {"value": 2},
+                                                    }
+                                                },
+                                            },
+                                        }
+                                    },
+                                    "input_000002": {
+                                        "shadow": {
+                                            "type": "dict_unpack",
+                                            "inputs": {
+                                                "value": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "d"
+                                                            }
+                                                        },
+                                                    }
+                                                }
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    },
+                    "fields": {"var": {"name": "d2"}},
+                },
             ]
         }
     }, result

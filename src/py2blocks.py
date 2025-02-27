@@ -119,11 +119,37 @@ def traverse_node(node):
             "format_spec": traverse_node(node.format_spec),
         }
     elif isinstance(node, ast.JoinedStr):
-        # TODO: Implement JoinedStr properly as an f-string block later.
-        # For now, just treat it as an ast.Str, but keep the type as-is so
-        # the blocks know it's an f-string.
         values = [traverse_node(value) for value in node.values]
         block["fields"] = {"value": values}
+    elif isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        block["extraState"] = {"items": len(node.elts)}
+        block["inputs"] = {}
+        for i, elt in enumerate(node.elts, start=1):
+            block["inputs"][f"input_{i:06}"] = {"block": traverse_node(elt)}
+    elif isinstance(node, ast.Dict):
+        block["extraState"] = {"items": len(node.keys)}
+        block["inputs"] = {}
+        for i, (key, value) in enumerate(zip(node.keys, node.values), start=1):
+            if key is None:
+                # This is a **some_dict argument to unpack.
+                block["inputs"][f"input_{i:06}"] = {
+                    "shadow": {
+                        "type": "dict_unpack",
+                        "inputs": {
+                            "value": {"block": traverse_node(value)},
+                        },
+                    }
+                }
+            else:
+                block["inputs"][f"input_{i:06}"] = {
+                    "shadow": {
+                        "type": "dict_item",
+                        "inputs": {
+                            "key": {"block": traverse_node(key)},
+                            "value": {"block": traverse_node(value)},
+                        },
+                    }
+                }
     elif isinstance(node, ast.Assign):
         block["inputs"] = {
             "value": {
