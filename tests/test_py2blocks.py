@@ -590,7 +590,8 @@ async def test_dict():
 async def test_dict_with_pompoms_to_unpack():
     """
     Ensure that a dict as {"a": 1, **foo} is converted to Blockly JSON
-    correctly. I.e. the **foo is destructured into individual items.
+    correctly. I.e. the **foo (pompom foo) is destructured into individual
+    key-value items in the new dict.
     """
     python_code = 'd = {"a": 1}\nd2 = {"b": 2, **d}'
     result = json.loads(py2blocks.py2blocks(python_code))
