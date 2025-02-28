@@ -42,6 +42,25 @@ async def test_with_syntax_error():
     }, result
 
 
+async def test_unsupported_code():
+    """
+    Ensure that any Python code that is not supported is handled gracefully by
+    a catch_all block.
+    """
+    python_code = "match x:\n    case 'Relevant':\n        return 1"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "catch_all",
+                    "fields": {"code": python_code},
+                }
+            ]
+        }
+    }, result
+
+
 async def test_function_no_args_no_body_no_return():
     """
     Ensure that a simple function is converted to Blockly JSON correctly.
@@ -687,6 +706,34 @@ async def test_dict_with_pompoms_to_unpack():
                     },
                     "fields": {"var": {"name": "d2"}},
                 },
+            ]
+        }
+    }, result
+
+
+async def test_del_variable():
+    """
+    Using the del keyword to delete a variable is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "del my_variable"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to create the expected list block for:
+    # render_blocks("test_bool_op", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Delete",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "my_variable"}},
+                            }
+                        }
+                    },
+                }
             ]
         }
     }, result

@@ -92,6 +92,8 @@ def traverse_node(node):
     # Traverse the node and generate the Blockly JSON.
     if node is None:
         return node
+    elif isinstance(node, ast.Pass):
+        return block
     elif isinstance(node, ast.FunctionDef):
         block["fields"] = {"name": node.name}
         if node.args.args:
@@ -157,6 +159,12 @@ def traverse_node(node):
             },
         }
         block["fields"] = {"var": {"name": node.targets[0].id}}
+    elif isinstance(node, ast.Delete):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.targets[0]),
+            },
+        }
     elif isinstance(node, ast.AugAssign):
         block["inputs"] = {
             "value": {
@@ -202,18 +210,9 @@ def traverse_node(node):
                 },
             }
         block["fields"] = {"op": type(node.op).__name__}
-
-    """
-    elif isinstance(node, ast.Expr):
-        block["type"] = "expr"
-        block["value"] = traverse_node(node.value)
-    elif isinstance(node, ast.Call):
-        block["type"] = "call"
-        block["func"] = traverse_node(node.func)
-        block["args"] = [traverse_node(a) for a in node.args]
-        block["keywords"] = [traverse_node(k) for k in node.keywords]
-    elif isinstance(node, ast.USub):
-        pass
-    return block
-    """
+    else:
+        # If the node is not supported, we need to provide enough context for
+        # the catch-all block that just contains arbitrary code.
+        block["type"] = "catch_all"
+        block["fields"] = {"code": ast.unparse(node)}
     return block
