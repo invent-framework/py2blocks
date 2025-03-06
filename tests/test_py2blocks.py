@@ -737,3 +737,71 @@ async def test_del_variable():
             ]
         }
     }, result
+
+async def test_basic_builtin_block():
+    """
+    Ensure that a built-in function call is converted to the appropriate
+    block template.
+    """
+    python_code = "print('Hello, World!')"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_basic_builtin_block", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "print_block",
+                    "inputs": {
+                        "ARG0": {
+                            "block": {
+                                "type": "str",
+                                "fields": {"value": "Hello, World!"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+async def test_builtin_to_user_function_fallback():
+    """
+    Test that when a function doesn't match a built-in template, it falls back
+    to the generic function_call representation with a name field.
+    """
+    python_code = "custom_function('test', param=123)"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_builtin_to_user_function_fallback", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "function_call",
+                    "fields": {"name": "custom_function"},
+                    "inputs": {
+                        "arg_000001": {
+                            "block": {
+                                "type": "str",
+                                "fields": {"value": "test"},
+                            }
+                        },
+                        "kwarg_000001": {
+                            "block": {
+                                "type": "keyword",
+                                "fields": {"arg": "param"},
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 123},
+                                        }
+                                    }
+                                },
+                            }
+                        },
+                    },
+                    "extraState": {"args": 1, "keywords": 1},
+                }
+            ]
+        }
+    }, result
