@@ -34,3 +34,26 @@ to the matching Python `ast` node type. Depending on the type of block, they
 may contain other attributes. The available blocks can be found in the
 `src/blocks` folder of this repository. Please see the README.md therein for
 more information.
+
+## Pre-defined vs User-defined functions
+
+Sometimes, for ease of use, guidance and simplicity we will provide pre-defined
+blocks that represent built-in functionality. For example, the builtin
+`print` function in Python may have a simple, and equivalent, `print` block.
+
+In addition, users may define their own functions via blocks, and will then
+have to call these functions via a special `function_call` block.
+
+For this to work, when py2blocks encounters a function call the following
+algorithm is used:
+
+* Is the name of the function in the `builtin` collection of pre-defined
+  blocks?
+* If `True`, use the provided template for that pre-defined block, to render
+  the JSON output that constitutes the blockly object model.
+* If `False`, just create a `function_call` block with the relevant name and
+  arguments slotted into place.
+* That's it!
+
+We will provide mechanism for third parties to be able to pre-define blocks, in
+addition to the blocks we provide automatically.
