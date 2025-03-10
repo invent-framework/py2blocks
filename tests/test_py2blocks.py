@@ -79,6 +79,9 @@ async def test_function_no_args_no_body_no_return():
             ]
         }
     }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
 
 
 async def test_function_no_args_no_body_with_return():
@@ -114,6 +117,9 @@ async def test_function_no_args_no_body_with_return():
             ]
         }
     }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
 
 
 async def test_function_no_args_with_body_with_return():
@@ -165,6 +171,9 @@ async def test_function_no_args_with_body_with_return():
             ]
         }
     }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
 
 
 async def test_function_with_args_with_body_with_return():
@@ -238,6 +247,9 @@ async def test_function_with_args_with_body_with_return():
             ]
         }
     }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
 
 
 async def test_function_inside_another_function():
@@ -294,6 +306,157 @@ async def test_function_inside_another_function():
                             }
                         }
                     },
+                }
+            ]
+        }
+    }, result
+    assert (
+        "outer_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
+    assert (
+        "inner_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
+
+
+async def test_calling_user_defined_function():
+    # TODO: check number of args and keywords is reflected in the call block.
+    python_code = "def test_function():\n    return 1\n\ntest_function()"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_calling_user_defined_function", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "FunctionDef",
+                    "fields": {"name": "test_function"},
+                    "inputs": {
+                        "body": {
+                            "block": {
+                                "type": "Return",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    },
+                },
+                {
+                    "type": "function_call",
+                    "fields": {"name": "test_function"},
+                    "inputs": {},
+                    "extraState": {"args": 0, "keywords": 0},
+                },
+            ]
+        }
+    }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
+
+
+async def test_user_defined_function_with_args_and_kwargs():
+    python_code = (
+        "def test_function(x, y=1):\n    return x + y\n\ntest_function(2, y=3)"
+    )
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_user_defined_function_with_args_and_kwargs", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "FunctionDef",
+                    "fields": {"name": "test_function", "args": ["x", "y"]},
+                    "inputs": {
+                        "body": {
+                            "block": {
+                                "type": "Return",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "BinOp",
+                                            "fields": {"op": "Add"},
+                                            "inputs": {
+                                                "left": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "x"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                "right": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "y"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                            },
+                                        }
+                                    }
+                                },
+                            }
+                        }
+                    },
+                },
+                {
+                    "type": "function_call",
+                    "fields": {"name": "test_function"},
+                    "inputs": {
+                        "arg_000001": {
+                            "block": {
+                                "type": "int",
+                                "fields": {"value": 2},
+                            }
+                        },
+                        "kwarg_000001": {
+                            "block": {
+                                "type": "keyword",
+                                "fields": {"arg": "y"},
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 3},
+                                        }
+                                    }
+                                },
+                            }
+                        },
+                    },
+                    "extraState": {"args": 1, "keywords": 1},
+                },
+            ]
+        }
+    }, result
+    assert (
+        "test_function" in py2blocks.USER_DEFINED_FUNCTIONS
+    ), "Missing user defined function."
+
+
+async def test_non_existent_user_defined_function_call():
+    """
+    Ensure that calling a non-existent user defined function is handled
+    gracefully. The resulting block is the catch-all block.
+    """
+    python_code = "non_existent_function()"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "catch_all",
+                    "fields": {"code": python_code},
                 }
             ]
         }
@@ -738,6 +901,7 @@ async def test_del_variable():
         }
     }, result
 
+
 async def test_basic_builtin_block():
     """
     Ensure that a built-in function call is converted to the appropriate
@@ -759,48 +923,6 @@ async def test_basic_builtin_block():
                             }
                         }
                     },
-                }
-            ]
-        }
-    }, result
-
-async def test_builtin_to_user_function_fallback():
-    """
-    Test that when a function doesn't match a built-in template, it falls back
-    to the generic function_call representation with a name field.
-    """
-    python_code = "custom_function('test', param=123)"
-    result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_builtin_to_user_function_fallback", result)
-    assert result == {
-        "blocks": {
-            "blocks": [
-                {
-                    "type": "function_call",
-                    "fields": {"name": "custom_function"},
-                    "inputs": {
-                        "arg_000001": {
-                            "block": {
-                                "type": "str",
-                                "fields": {"value": "test"},
-                            }
-                        },
-                        "kwarg_000001": {
-                            "block": {
-                                "type": "keyword",
-                                "fields": {"arg": "param"},
-                                "inputs": {
-                                    "value": {
-                                        "block": {
-                                            "type": "int",
-                                            "fields": {"value": 123},
-                                        }
-                                    }
-                                },
-                            }
-                        },
-                    },
-                    "extraState": {"args": 1, "keywords": 1},
                 }
             ]
         }

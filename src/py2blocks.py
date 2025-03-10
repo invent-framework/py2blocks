@@ -15,16 +15,27 @@ import ast
 import json
 import copy
 
+
+# Contains definitions of built-in functions and their corresponding block
+# templates.
 BUILTIN_BLOCKS = {
     "print": {
         "type": "print_block",
         "inputs": {
-            "ARG0": {
-                "block": None  # Will be filled with the first argument
-            }
-        }
+            "ARG0": {"block": None}  # Will be filled with the first argument
+        },
     },
 }
+
+
+# Contains definitions of user-defined functions and their corresponding block
+# templates. This dictionary is populated by the user-defined functions in the
+# Python code. Functions defined in this dictionary allow us to ensure the user
+# doesn't try to call non-existent functions. The key is the function name and
+# the value is the blockly id and metadata needed to generate a valid block for
+# the function.
+USER_DEFINED_FUNCTIONS = {}
+
 
 def py2blocks(code):
     """
@@ -90,120 +101,159 @@ def traverse_body(body):
         )
     return block
 
+
+def register_builtin_block(name, template):
+    """
+    Register a new built-in function with its block template.
+
+    Args:
+        name (str): The name of the built-in function (e.g., 'print' or 'invent.publish').
+        template (dict): The template to use for this function.
+    """
+    BUILTIN_BLOCKS[name] = template
+
+
 def get_function_key(node):
     """
     Get the function key for the BUILTIN_BLOCKS dictionary.
     For module.function calls, combines the module and function name.
-    
+
     Args:
         node (ast.Call): The function call node.
-        
+
     Returns:
         str or None: The function key or None if it's not a simple name or attribute.
     """
     if isinstance(node.func, ast.Name):
         return node.func.id
-    elif isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+    elif isinstance(node.func, ast.Attribute) and isinstance(
+        node.func.value, ast.Name
+    ):
         # Handle module.function style calls (e.g., invent.subscribe)
         return f"{node.func.value.id}.{node.func.attr}"
     return None
 
+
 def is_builtin_function(function_key):
     """
     Check if a function key is in the built-in collection.
-    
+
     Args:
         function_key (str): The function key to check.
-        
+
     Returns:
         bool: True if the function is a built-in, False otherwise.
     """
     return function_key in BUILTIN_BLOCKS
 
+
 def extract_constant_value(arg_block):
     """
     Extract a constant value from an argument block if possible.
-    
+
     Args:
         arg_block (dict): The block representing an argument.
-        
+
     Returns:
         Any: The constant value if it can be extracted, otherwise None.
     """
     # Check if the block is a constant type
-    if arg_block and "type" in arg_block and "fields" in arg_block and "value" in arg_block["fields"]:
+    if (
+        arg_block
+        and "type" in arg_block
+        and "fields" in arg_block
+        and "value" in arg_block["fields"]
+    ):
         # Basic types: int, float, str, bool, etc.
         return arg_block["fields"]["value"]
     return None
 
+
 def get_function_name(node):
     """
     Get a simple representation of the function name for function_call blocks.
-    
+
     Args:
         node (ast.Call): The call node.
-        
+
     Returns:
         str or None: A string representation of the function name if simple, None if complex.
     """
     if isinstance(node.func, ast.Name):
         # Simple function name
         return node.func.id
-    elif isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
+    elif isinstance(node.func, ast.Attribute) and isinstance(
+        node.func.value, ast.Name
+    ):
         # Module.function style
         return f"{node.func.value.id}.{node.func.attr}"
     return None
+
+
+def catch_all(node, block):
+    """
+    If the node is not supported, we need to provide enough context for a
+    catch-all block that just contains arbitrary code.
+    """
+    block["type"] = "catch_all"
+    block["fields"] = {"code": ast.unparse(node)}
+    return block
+
 
 def apply_template(template, arg_blocks, kwarg_blocks):
     """
     Apply arguments to a template following a consistent pattern.
     This function makes a deep copy of the template and fills in placeholders.
-    
+
     Args:
         template (dict): The template to fill.
         arg_blocks (list): List of blocks for positional arguments.
         kwarg_blocks (list): List of (name, block) tuples for keyword arguments.
-        
+
     Returns:
         dict: A new block with the arguments applied to the template.
     """
     # Create a deep copy of the template to avoid modifying the original
     result = copy.deepcopy(template)
-    
+
     # First, handle field mappings if present
     if "field_mapping" in result:
         field_mappings = result["field_mapping"]
-        
+
         # Create a dictionary of keyword arguments for easier lookup
         kwarg_dict = {name: block for name, block in kwarg_blocks}
-        
+
         # Apply field mappings
         for field_name, mapping in field_mappings.items():
             # Check if we need to map from a positional argument
-            if "arg_index" in mapping and mapping["arg_index"] < len(arg_blocks):
+            if "arg_index" in mapping and mapping["arg_index"] < len(
+                arg_blocks
+            ):
                 arg_index = mapping["arg_index"]
                 value = extract_constant_value(arg_blocks[arg_index])
-                
+
                 # If we successfully extracted a value, apply it to the field
                 if value is not None:
                     # Apply the extracted value to the field
                     if "fields" in result:
                         result["fields"][field_name] = value
-            
+
             # Check if we need to map from a keyword argument
-            elif "kwarg_name" in mapping and mapping["kwarg_name"] in kwarg_dict:
+            elif (
+                "kwarg_name" in mapping and mapping["kwarg_name"] in kwarg_dict
+            ):
                 kwarg_name = mapping["kwarg_name"]
                 value = extract_constant_value(kwarg_dict[kwarg_name])
-                
+
                 # If we successfully extracted a value, apply it to the field
                 if value is not None:
                     # Apply the extracted value to the field
                     if "fields" in result:
                         result["fields"][field_name] = value
-        
+
         # Remove the field_mapping from the result as it's not part of the Blockly format
         del result["field_mapping"]
-    
+
     # Process the inputs dictionary if it exists
     if "inputs" in result:
         # Apply positional arguments (ARG0, ARG1, ARG2, etc.)
@@ -214,9 +264,15 @@ def apply_template(template, arg_blocks, kwarg_blocks):
                 if "shadow" in result["inputs"][arg_key]:
                     # Check if we can reuse the shadow block structure
                     shadow = result["inputs"][arg_key]["shadow"]
-                    if shadow["type"] == arg_block["type"] and "fields" in shadow and "fields" in arg_block:
+                    if (
+                        shadow["type"] == arg_block["type"]
+                        and "fields" in shadow
+                        and "fields" in arg_block
+                    ):
                         # Update the fields in the shadow block
-                        for field_key, field_value in arg_block["fields"].items():
+                        for field_key, field_value in arg_block[
+                            "fields"
+                        ].items():
                             if field_key in shadow["fields"]:
                                 shadow["fields"][field_key] = field_value
                     else:
@@ -225,7 +281,7 @@ def apply_template(template, arg_blocks, kwarg_blocks):
                 else:
                     # No shadow, just set the block directly
                     result["inputs"][arg_key]["block"] = arg_block
-    
+
     # Apply keyword arguments that didn't get used in field mappings
     for kw_name, kw_block in kwarg_blocks:
         kw_key = f"KWARG_{kw_name}"
@@ -234,7 +290,11 @@ def apply_template(template, arg_blocks, kwarg_blocks):
             if "shadow" in result["inputs"][kw_key]:
                 # Similar logic to positional args with shadows
                 shadow = result["inputs"][kw_key]["shadow"]
-                if shadow["type"] == kw_block["type"] and "fields" in shadow and "fields" in kw_block:
+                if (
+                    shadow["type"] == kw_block["type"]
+                    and "fields" in shadow
+                    and "fields" in kw_block
+                ):
                     for field_key, field_value in kw_block["fields"].items():
                         if field_key in shadow["fields"]:
                             shadow["fields"][field_key] = field_value
@@ -247,8 +307,9 @@ def apply_template(template, arg_blocks, kwarg_blocks):
             if "inputs" not in result:
                 result["inputs"] = {}
             result["inputs"][kw_key] = {"block": kw_block}
-    
+
     return result
+
 
 def traverse_node(node):
     """
@@ -272,6 +333,11 @@ def traverse_node(node):
         body = traverse_body(node.body)
         if body:
             block["inputs"]["body"]["block"] = body
+        # Register the function for later use. TODO: FIXME for nested functions.
+        USER_DEFINED_FUNCTIONS[node.name] = {
+            "function_name": node.name,
+            "args": block["fields"].get("args", []),
+        }
     elif isinstance(node, ast.Return):
         block["inputs"] = {
             "value": {
@@ -383,34 +449,40 @@ def traverse_node(node):
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
-        
+
         # Process positional arguments
         arg_blocks = [traverse_node(arg) for arg in node.args]
-        
+
         # Process keyword arguments
-        kwarg_blocks = [(kw.arg, traverse_node(kw.value)) for kw in node.keywords if kw.arg is not None]
-        
+        kwarg_blocks = [
+            (kw.arg, traverse_node(kw.value))
+            for kw in node.keywords
+            if kw.arg is not None
+        ]
+
         # Check if it's a built-in function with a pre-defined block template
         if function_key and is_builtin_function(function_key):
             # Get the template and apply the arguments
             template = BUILTIN_BLOCKS[function_key]
             block = apply_template(template, arg_blocks, kwarg_blocks)
-            
+
             # Handle kwargs unpacking if present
-            kwargs_unpack = [kw.value for kw in node.keywords if kw.arg is None]
+            kwargs_unpack = [
+                kw.value for kw in node.keywords if kw.arg is None
+            ]
             if kwargs_unpack:
                 if "inputs" not in block:
                     block["inputs"] = {}
                 block["inputs"]["KWARGS_UNPACK"] = {
                     "block": traverse_node(kwargs_unpack[0])
                 }
-        else:
+        elif function_key in USER_DEFINED_FUNCTIONS:
             # It's a user-defined function or a method call
             block["type"] = "function_call"
-            
+
             # Get function name for simple cases
             func_name = get_function_name(node)
-            
+
             if func_name:
                 # Simple function name - use a field
                 block["fields"] = {"name": func_name}
@@ -422,48 +494,47 @@ def traverse_node(node):
                         "block": traverse_node(node.func),
                     }
                 }
-            
+
             # Add positional arguments
-            if node.args:
-                block["extraState"] = block.get("extraState", {})
-                block["extraState"]["args"] = len(node.args)
-                if "inputs" not in block:
-                    block["inputs"] = {}
-                for i, arg in enumerate(node.args, start=1):
-                    block["inputs"][f"arg_{i:06}"] = {
-                        "block": traverse_node(arg),
-                    }
-            
+            block["extraState"] = block.get("extraState", {})
+            block["extraState"]["args"] = len(node.args)
+            if "inputs" not in block:
+                block["inputs"] = {}
+            for i, arg in enumerate(node.args, start=1):
+                block["inputs"][f"arg_{i:06}"] = {
+                    "block": traverse_node(arg),
+                }
+
             # Add keyword arguments
-            if node.keywords:
-                block["extraState"] = block.get("extraState", {})
-                block["extraState"]["keywords"] = len(node.keywords)
-                if "inputs" not in block:
-                    block["inputs"] = {}
-                for i, keyword in enumerate(node.keywords, start=1):
-                    if keyword.arg is None:
-                        # This is a **kwargs argument
-                        block["inputs"][f"kwarg_{i:06}"] = {
-                            "block": {
-                                "type": "kwargs_unpack",
-                                "inputs": {
-                                    "value": {"block": traverse_node(keyword.value)},
+            block["extraState"] = block.get("extraState", {})
+            block["extraState"]["keywords"] = len(node.keywords)
+            for i, keyword in enumerate(node.keywords, start=1):
+                if keyword.arg is None:
+                    # This is a **kwargs argument
+                    block["inputs"][f"kwarg_{i:06}"] = {
+                        "block": {
+                            "type": "kwargs_unpack",
+                            "inputs": {
+                                "value": {
+                                    "block": traverse_node(keyword.value)
                                 },
                             },
-                        }
-                    else:
-                        block["inputs"][f"kwarg_{i:06}"] = {
-                            "block": {
-                                "type": "keyword",
-                                "fields": {"arg": keyword.arg},
-                                "inputs": {
-                                    "value": {"block": traverse_node(keyword.value)},
+                        },
+                    }
+                else:
+                    block["inputs"][f"kwarg_{i:06}"] = {
+                        "block": {
+                            "type": "keyword",
+                            "fields": {"arg": keyword.arg},
+                            "inputs": {
+                                "value": {
+                                    "block": traverse_node(keyword.value)
                                 },
                             },
-                        }
+                        },
+                    }
+        else:
+            block = catch_all(node, block)
     else:
-        # If the node is not supported, we need to provide enough context for
-        # the catch-all block that just contains arbitrary code.
-        block["type"] = "catch_all"
-        block["fields"] = {"code": ast.unparse(node)}
+        block = catch_all(node, block)
     return block
