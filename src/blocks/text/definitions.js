@@ -1,3 +1,5 @@
+const textColor = "#ccb3ff";
+
 const print_block = {
     init: function() {
       this.appendDummyInput('')
@@ -8,7 +10,7 @@ const print_block = {
       this.setInputsInline(true)
       this.setPreviousStatement(true, null);
       this.setNextStatement(true, null);
-      this.setColour(225);
+      this.setColour(textColor);
     }
 };
 Blockly.common.defineBlocks({print_block: print_block});
