@@ -57,3 +57,8 @@ algorithm is used:
 
 We will provide mechanism for third parties to be able to pre-define blocks, in
 addition to the blocks we provide automatically.
+
+## Open Source Acknowledgements
+
+The drag strategy plugin is derived from the Apache 2.0 licenced 
+[Makecode](https://github.com/microsoft/pxt), a project of Microsoft. 

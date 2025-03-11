@@ -10,15 +10,24 @@
     <link rel="stylesheet" href="https://pyscript.net/releases/2025.2.4/core.css" />
     <script type="module" src="https://pyscript.net/releases/2025.2.4/core.js"></script>
 
+    <!-- Blockly -->
     <script src="https://unpkg.com/blockly/blockly.min.js"></script>
 
+    <!-- Blockly Plugins -->
+    <script src="https://unpkg.com/@blockly/block-shareable-procedures@5.0.12/dist/index.js"></script>  
+    <script>
+      registerProcedureSerializer();
+    </script>  
+
+    <script type="module" src="/src/plugins/drag-strategy/drag-strategy.js"></script>
+
     <!-- Blocks -->
-    <script src="/src/blocks/theme.js"></script>
-    <script src="/src/blocks/common/definitions.js"></script>
-    <script src="/src/blocks/functions/definitions.js"></script>
-    <script src="/src/blocks/variables/definitions.js"></script>
-    <script src="/src/blocks/math/definitions.js"></script>
-    <script src="/src/blocks/text/definitions.js"></script>
+    <script type="module" src="/src/blocks/theme.js"></script>
+    <script type="module" src="/src/blocks/common/definitions.js"></script>
+    <script type="module" src="/src/blocks/functions/definitions.js"></script>
+    <script type="module" src="/src/blocks/variables/definitions.js"></script>
+    <script type="module" src="/src/blocks/math/definitions.js"></script>
+    <script type="module" src="/src/blocks/text/definitions.js"></script>
 
     <style>
     body {

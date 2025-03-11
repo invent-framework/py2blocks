@@ -73,7 +73,11 @@ async def test_function_no_args_no_body_no_return():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [],
+                    },
                     "inputs": {"body": {"block": {"type": "Pass"}}},
                 }
             ]
@@ -97,7 +101,11 @@ async def test_function_no_args_no_body_with_return():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
@@ -135,7 +143,11 @@ async def test_function_no_args_with_body_with_return():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
@@ -190,20 +202,19 @@ async def test_function_with_args_with_body_with_return():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {
+                    "extraState": {
+                        "create_new_model": True,
                         "name": "test_function",
-                        "args": ["x"],
+                        "args": [{"name": "x"}],
                     },
                     "inputs": {
                         "body": {
                             "block": {
                                 "type": "Assign",
-                                "fields": {"var": {"name": "y"}},
                                 "inputs": {
                                     "value": {
                                         "block": {
                                             "type": "BinOp",
-                                            "fields": {"op": "Add"},
                                             "inputs": {
                                                 "left": {
                                                     "block": {
@@ -222,9 +233,11 @@ async def test_function_with_args_with_body_with_return():
                                                     }
                                                 },
                                             },
+                                            "fields": {"op": "Add"},
                                         }
                                     }
                                 },
+                                "fields": {"var": {"name": "y"}},
                                 "next": {
                                     "block": {
                                         "type": "Return",
@@ -238,8 +251,14 @@ async def test_function_with_args_with_body_with_return():
                                                 }
                                             }
                                         },
-                                    },
+                                    }
                                 },
+                            }
+                        },
+                        "arg_000001": {
+                            "block": {
+                                "type": "Argument",
+                                "fields": {"name": "x"},
                             }
                         },
                     },
@@ -265,12 +284,20 @@ async def test_function_inside_another_function():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "outer_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "outer_function",
+                        "args": [],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
                                 "type": "FunctionDef",
-                                "fields": {"name": "inner_function"},
+                                "extraState": {
+                                    "create_new_model": True,
+                                    "name": "inner_function",
+                                    "args": [],
+                                },
                                 "inputs": {
                                     "body": {
                                         "block": {
@@ -328,7 +355,11 @@ async def test_calling_user_defined_function():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
@@ -370,7 +401,11 @@ async def test_user_defined_function_with_args_and_kwargs():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function", "args": ["x", "y"]},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [{"name": "x"}, {"name": "y"}],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
@@ -379,7 +414,6 @@ async def test_user_defined_function_with_args_and_kwargs():
                                     "value": {
                                         "block": {
                                             "type": "BinOp",
-                                            "fields": {"op": "Add"},
                                             "inputs": {
                                                 "left": {
                                                     "block": {
@@ -402,11 +436,24 @@ async def test_user_defined_function_with_args_and_kwargs():
                                                     }
                                                 },
                                             },
+                                            "fields": {"op": "Add"},
                                         }
                                     }
                                 },
                             }
-                        }
+                        },
+                        "arg_000001": {
+                            "block": {
+                                "type": "Argument",
+                                "fields": {"name": "x"},
+                            }
+                        },
+                        "arg_000002": {
+                            "block": {
+                                "type": "Argument",
+                                "fields": {"name": "y"},
+                            }
+                        },
                     },
                 },
                 {
@@ -414,10 +461,7 @@ async def test_user_defined_function_with_args_and_kwargs():
                     "fields": {"name": "test_function"},
                     "inputs": {
                         "arg_000001": {
-                            "block": {
-                                "type": "int",
-                                "fields": {"value": 2},
-                            }
+                            "block": {"type": "int", "fields": {"value": 2}}
                         },
                         "kwarg_000001": {
                             "block": {
@@ -476,7 +520,11 @@ async def test_bool_op():
             "blocks": [
                 {
                     "type": "FunctionDef",
-                    "fields": {"name": "test_function"},
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "test_function",
+                        "args": [],
+                    },
                     "inputs": {
                         "body": {
                             "block": {
