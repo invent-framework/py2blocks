@@ -1,6 +1,6 @@
 import { setDuplicateOnDragStrategy } from "../../plugins/drag-strategy/drag-strategy.js";
 
-const functionsColour = "#ff99aa";
+const functionsColor = "#ff99aa";
 
 const FunctionDef = {
 	init: function() {
@@ -27,15 +27,13 @@ const FunctionDef = {
 
 		const args = this.model.getParameters();
 
-    console.log(args);
-
 		if (args.length > 0) {
 			this.appendDummyInput()
 				.appendField("(");	
 
 			args.forEach((arg, index) => {
-        index = index + 1;
-        index = index.toString().padStart(6, '0');
+				index = index + 1;
+				index = index.toString().padStart(6, '0');
 				if (index > 1) {
 					this.appendValueInput(`arg_${index}`)
 						.appendField(",");
@@ -92,6 +90,77 @@ const FunctionDef = {
 };
 Blockly.common.defineBlocks({FunctionDef: FunctionDef});
 
+// TODO: Add support for inline function definitions & predefined procedure models
+const Call = {
+	init: function() {
+		this.appendDummyInput()
+			.appendField(new Blockly.FieldLabel(""), "name");
+		this.setColour(functionsColor);
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+	},
+	saveExtraState() {
+		return {
+			"name": this.name,
+			"args": this.argsCount,
+			"kwargs": this.kwargsCount
+		};	
+	},
+	loadExtraState(state) {
+		if (state.name) {
+			this.name = state.name;
+			this.setFieldValue(this.name, "name");
+			this.argsCount = state.args;
+			this.kwargsCount = state.kwargs;
+			this.doProcedureUpdate();
+		}
+	},
+	doProcedureUpdate: function() {		
+		if (this.argsCount || this.kwargsCount) {
+			this.appendDummyInput()
+				.appendField("(");
+
+			for (let i = 0; i < this.argsCount; i++) {
+				let index = i + 1;
+				index = index.toString().padStart(6, '0');
+				if (index > 1) {
+					this.appendValueInput(`arg_${index}`)
+						.appendField(",");
+				}
+				else {
+					this.appendValueInput(`arg_${index}`);
+				}
+			}
+
+			if (this.argsCount > 0 && this.kwargsCount > 0) {
+				this.appendDummyInput()
+					.appendField(",");
+			}
+
+			for (let i = 0; i < this.kwargsCount; i++) {
+				let index = i + 1;
+				index = index.toString().padStart(6, '0');
+				if (index > 1) {
+					this.appendValueInput(`kwarg_${index}`)
+						.appendField(",");
+				}
+				else {
+					this.appendValueInput(`kwarg_${index}`);
+				}
+			}
+
+			this.appendDummyInput()
+				.appendField(")");
+		}
+		else {
+			this.appendDummyInput()
+				.appendField("()");
+		}
+	}
+};
+Blockly.common.defineBlocks({Call: Call});
+
 const Argument = {
 	init: function() {
 	  this.appendDummyInput()
@@ -109,7 +178,7 @@ const Pass = {
       this.appendDummyInput()
         .appendField('pass');
       this.setPreviousStatement(true, null);
-      this.setColour(functionsColour);
+      this.setColour(functionsColor);
     }
 };
 Blockly.common.defineBlocks({Pass: Pass});
@@ -121,7 +190,20 @@ const Return = {
     this.appendValueInput('value');
     this.setInputsInline(true)
     this.setPreviousStatement(true, null);
-    this.setColour(functionsColour);
+    this.setColour(functionsColor);
   }
 };
 Blockly.common.defineBlocks({Return: Return});
+
+const keyword = {
+	init: function() {
+	  this.appendDummyInput()
+		.appendField(new Blockly.FieldLabelSerializable(''), 'arg')
+		.appendField('=');
+	  this.appendValueInput('value');
+	  this.setInputsInline(true)
+	  this.setOutput(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({keyword: keyword});  

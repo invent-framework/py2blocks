@@ -349,7 +349,7 @@ async def test_calling_user_defined_function():
     # TODO: check number of args and keywords is reflected in the call block.
     python_code = "def test_function():\n    return 1\n\ntest_function()"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_calling_user_defined_function", result)
+    render_blocks("test_calling_user_defined_function", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -375,13 +375,18 @@ async def test_calling_user_defined_function():
                             }
                         }
                     },
-                },
-                {
-                    "type": "function_call",
-                    "fields": {"name": "test_function"},
-                    "inputs": {},
-                    "extraState": {"args": 0, "keywords": 0},
-                },
+                    "next": {
+                        "block": {
+                            "type": "Call",
+                            "extraState": {
+                                "name": "test_function",
+                                "args": 0,
+                                "kwargs": 0,
+                            },
+                            "inputs": {},
+                        }
+                    },
+                }
             ]
         }
     }, result
@@ -395,7 +400,7 @@ async def test_user_defined_function_with_args_and_kwargs():
         "def test_function(x, y=1):\n    return x + y\n\ntest_function(2, y=3)"
     )
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_user_defined_function_with_args_and_kwargs", result)
+    render_blocks("test_user_defined_function_with_args_and_kwargs", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -455,31 +460,39 @@ async def test_user_defined_function_with_args_and_kwargs():
                             }
                         },
                     },
-                },
-                {
-                    "type": "function_call",
-                    "fields": {"name": "test_function"},
-                    "inputs": {
-                        "arg_000001": {
-                            "block": {"type": "int", "fields": {"value": 2}}
-                        },
-                        "kwarg_000001": {
-                            "block": {
-                                "type": "keyword",
-                                "fields": {"arg": "y"},
-                                "inputs": {
-                                    "value": {
-                                        "block": {
-                                            "type": "int",
-                                            "fields": {"value": 3},
-                                        }
+                    "next": {
+                        "block": {
+                            "type": "Call",
+                            "extraState": {
+                                "name": "test_function",
+                                "args": 1,
+                                "kwargs": 1,
+                            },
+                            "inputs": {
+                                "arg_000001": {
+                                    "block": {
+                                        "type": "int",
+                                        "fields": {"value": 2},
                                     }
                                 },
-                            }
-                        },
+                                "kwarg_000001": {
+                                    "block": {
+                                        "type": "keyword",
+                                        "fields": {"arg": "y"},
+                                        "inputs": {
+                                            "value": {
+                                                "block": {
+                                                    "type": "int",
+                                                    "fields": {"value": 3},
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
+                            },
+                        }
                     },
-                    "extraState": {"args": 1, "keywords": 1},
-                },
+                }
             ]
         }
     }, result
@@ -825,8 +838,8 @@ async def test_dict_with_pompoms_to_unpack():
     """
     python_code = 'd = {"a": 1}\nd2 = {"b": 2, **d}'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    # TODO: Josh to create the expected dict block for:
+    # render_blocks("test_dict_with_pompoms_to_unpack", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -864,59 +877,63 @@ async def test_dict_with_pompoms_to_unpack():
                         }
                     },
                     "fields": {"var": {"name": "d"}},
-                },
-                {
-                    "type": "Assign",
-                    "inputs": {
-                        "value": {
-                            "block": {
-                                "type": "Dict",
-                                "extraState": {"items": 2},
-                                "inputs": {
-                                    "input_000001": {
-                                        "shadow": {
-                                            "type": "dict_item",
-                                            "inputs": {
-                                                "key": {
-                                                    "block": {
-                                                        "type": "str",
-                                                        "fields": {
-                                                            "value": "b"
-                                                        },
-                                                    }
-                                                },
-                                                "value": {
-                                                    "block": {
-                                                        "type": "int",
-                                                        "fields": {"value": 2},
-                                                    }
-                                                },
-                                            },
-                                        }
-                                    },
-                                    "input_000002": {
-                                        "shadow": {
-                                            "type": "dict_unpack",
-                                            "inputs": {
-                                                "value": {
-                                                    "block": {
-                                                        "type": "Name",
-                                                        "fields": {
-                                                            "var": {
-                                                                "name": "d"
+                    "next": {
+                        "block": {
+                            "type": "Assign",
+                            "inputs": {
+                                "value": {
+                                    "block": {
+                                        "type": "Dict",
+                                        "extraState": {"items": 2},
+                                        "inputs": {
+                                            "input_000001": {
+                                                "shadow": {
+                                                    "type": "dict_item",
+                                                    "inputs": {
+                                                        "key": {
+                                                            "block": {
+                                                                "type": "str",
+                                                                "fields": {
+                                                                    "value": "b"
+                                                                },
                                                             }
                                                         },
-                                                    }
+                                                        "value": {
+                                                            "block": {
+                                                                "type": "int",
+                                                                "fields": {
+                                                                    "value": 2
+                                                                },
+                                                            }
+                                                        },
+                                                    },
                                                 }
                                             },
-                                        }
-                                    },
-                                },
-                            }
+                                            "input_000002": {
+                                                "shadow": {
+                                                    "type": "dict_unpack",
+                                                    "inputs": {
+                                                        "value": {
+                                                            "block": {
+                                                                "type": "Name",
+                                                                "fields": {
+                                                                    "var": {
+                                                                        "name": "d"
+                                                                    }
+                                                                },
+                                                            }
+                                                        }
+                                                    },
+                                                }
+                                            },
+                                        },
+                                    }
+                                }
+                            },
+                            "fields": {"var": {"name": "d2"}},
                         }
                     },
-                    "fields": {"var": {"name": "d2"}},
-                },
+                }
             ]
         }
     }, result

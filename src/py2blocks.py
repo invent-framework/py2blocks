@@ -81,8 +81,17 @@ def traverse(tree):
         "blocks": [],
     }
     # Traverse the AST and generate the Blockly JSON.
+    previous_node = None
     for node in tree.body:
-        blocks["blocks"].append(traverse_node(node))
+        current_node = traverse_node(node)
+        if previous_node:
+            # We're recursing into the node tree so add the next block
+            # to the previous node.
+            previous_node["next"] = {"block": current_node}
+        else:
+            # The first block in the tree. Set it as the root.
+            blocks["blocks"].append(current_node)
+        previous_node = current_node
     return {
         "blocks": blocks,
     }
@@ -488,25 +497,16 @@ def traverse_node(node):
                 }
         elif function_key in USER_DEFINED_FUNCTIONS:
             # It's a user-defined function or a method call
-            block["type"] = "function_call"
+            block["extraState"] = block.get("extraState", {})
 
             # Get function name for simple cases
             func_name = get_function_name(node)
 
             if func_name:
-                # Simple function name - use a field
-                block["fields"] = {"name": func_name}
+                block["extraState"]["name"] = func_name
                 block["inputs"] = {}
-            else:
-                # Complex function expression - use an input
-                block["inputs"] = {
-                    "func": {
-                        "block": traverse_node(node.func),
-                    }
-                }
 
             # Add positional arguments
-            block["extraState"] = block.get("extraState", {})
             block["extraState"]["args"] = len(node.args)
             if "inputs" not in block:
                 block["inputs"] = {}
@@ -517,7 +517,7 @@ def traverse_node(node):
 
             # Add keyword arguments
             block["extraState"] = block.get("extraState", {})
-            block["extraState"]["keywords"] = len(node.keywords)
+            block["extraState"]["kwargs"] = len(node.keywords)
             for i, keyword in enumerate(node.keywords, start=1):
                 if keyword.arg is None:
                     # This is a **kwargs argument
