@@ -5,3 +5,17 @@ Blockly.Theme.defineTheme("py2blocks", {
 		family: "monospace"
 	},
 });
+
+Blockly.Css.register(`
+	.blocklyText {
+		fill: black !important;
+	}
+
+	.py2blocks-renderer.py2blocks-theme .blocklyDropdownText {
+    	fill: black !important;
+    }
+
+	.blocklyEditableText image {
+		filter: invert(1);
+	}
+`);
