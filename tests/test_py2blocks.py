@@ -19,7 +19,7 @@ def render_blocks(id, result):
     page.append(workspace_container)
     workspace = window.Blockly.inject(
         workspace_container.id,
-        {"renderer": "zelos", "theme": "py2blocks", "scrollbars": True},
+        {"renderer": "py2blocks", "theme": "py2blocks", "scrollbars": True},
     )
     window.Blockly.serialization.workspaces.load(result, workspace)
     window.workspace = workspace
