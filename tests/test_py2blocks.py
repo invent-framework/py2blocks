@@ -664,8 +664,7 @@ async def test_list():
     """
     python_code = '["a", "b", "c"]'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_list", result)
     assert result == {
         "blocks": {
             "blocks": [
