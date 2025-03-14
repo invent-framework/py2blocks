@@ -390,7 +390,7 @@ def traverse_node(node):
             if key is None:
                 # This is a **some_dict argument to unpack.
                 block["inputs"][f"input_{i:06}"] = {
-                    "shadow": {
+                    "block": {
                         "type": "dict_unpack",
                         "inputs": {
                             "value": {"block": traverse_node(value)},
@@ -399,7 +399,7 @@ def traverse_node(node):
                 }
             else:
                 block["inputs"][f"input_{i:06}"] = {
-                    "shadow": {
+                    "block": {
                         "type": "dict_item",
                         "inputs": {
                             "key": {"block": traverse_node(key)},

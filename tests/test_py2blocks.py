@@ -694,8 +694,7 @@ async def test_tuple():
     """
     python_code = '("a", "b", "c")'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_tuple", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -725,8 +724,7 @@ async def test_set():
     """
     python_code = '{"a", "b", "c"}'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_set", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -756,8 +754,7 @@ async def test_dict():
     """
     python_code = '{"a": 1, "b": 2, "c": 3}'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_dict", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -766,7 +763,7 @@ async def test_dict():
                     "extraState": {"items": 3},
                     "inputs": {
                         "input_000001": {
-                            "shadow": {
+                            "block": {
                                 "type": "dict_item",
                                 "inputs": {
                                     "key": {
@@ -785,7 +782,7 @@ async def test_dict():
                             }
                         },
                         "input_000002": {
-                            "shadow": {
+                            "block": {
                                 "type": "dict_item",
                                 "inputs": {
                                     "key": {
@@ -804,7 +801,7 @@ async def test_dict():
                             }
                         },
                         "input_000003": {
-                            "shadow": {
+                            "block": {
                                 "type": "dict_item",
                                 "inputs": {
                                     "key": {
@@ -851,7 +848,7 @@ async def test_dict_with_pompoms_to_unpack():
                                 "extraState": {"items": 1},
                                 "inputs": {
                                     "input_000001": {
-                                        "shadow": {
+                                        "block": {
                                             "type": "dict_item",
                                             "inputs": {
                                                 "key": {
@@ -886,7 +883,7 @@ async def test_dict_with_pompoms_to_unpack():
                                         "extraState": {"items": 2},
                                         "inputs": {
                                             "input_000001": {
-                                                "shadow": {
+                                                "block": {
                                                     "type": "dict_item",
                                                     "inputs": {
                                                         "key": {
@@ -909,7 +906,7 @@ async def test_dict_with_pompoms_to_unpack():
                                                 }
                                             },
                                             "input_000002": {
-                                                "shadow": {
+                                                "block": {
                                                     "type": "dict_unpack",
                                                     "inputs": {
                                                         "value": {
