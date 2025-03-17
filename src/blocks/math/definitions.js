@@ -1,5 +1,16 @@
 const mathColour = "#ff99aa";
 
+const int = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField(new Blockly.FieldNumber(0), "value");
+    this.setInputsInline(true)
+    this.setOutput(true, "int");
+    this.setColour("#ffffff");
+  }
+};
+Blockly.common.defineBlocks({int: int});
+
 const BinOp = {
   init: function() {
     this.appendValueInput('left');

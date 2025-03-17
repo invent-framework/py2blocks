@@ -1,4 +1,17 @@
+import { FieldString } from "../../fields/field_string.js";
+
 const textColor = "#ccb3ff";
+
+const str = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField(new FieldString(""), "value");
+    this.setInputsInline(true)
+    this.setOutput(true, "str");
+    this.setColour("#ffffff");
+  }
+};
+Blockly.common.defineBlocks({str: str});
 
 const print_block = {
     init: function() {

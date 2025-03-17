@@ -24,7 +24,7 @@ const Name = {
       this.appendDummyInput('')
         .appendField(new Blockly.FieldVariable(''), 'var');
       this.setInputsInline(true)
-      this.setOutput(true, null);
+      this.setOutput(true, "Name");
       this.setColour(variablesColor);
     }
   };
