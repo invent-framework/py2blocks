@@ -43,12 +43,17 @@ export function createCollectionBlock(open_with, close_with, has_key_value=false
             this.itemCount++;
             const count = this.itemCount.toString().padStart(6, '0');
     
+            let input;
             if (this.itemCount > 1) {
-                this.appendValueInput(`input_${count}`)
+                input = this.appendValueInput(`input_${count}`)
                     .appendField(",");
             }
             else {
-                this.appendValueInput(`input_${count}`);
+                input = this.appendValueInput(`input_${count}`);
+            }
+
+            if (has_key_value) {
+                input.connection.setCheck('dict_item');
             }
         },
     

@@ -5,7 +5,7 @@ const int = {
     this.appendDummyInput()
       .appendField(new Blockly.FieldNumber(0), "value");
     this.setInputsInline(true)
-    this.setOutput(true, null);
+    this.setOutput(true, "int");
     this.setColour("#ffffff");
   }
 };
@@ -16,7 +16,7 @@ const str = {
     this.appendDummyInput()
       .appendField(new FieldString(""), "value");
     this.setInputsInline(true)
-    this.setOutput(true, null);
+    this.setOutput(true, "str");
     this.setColour("#ffffff");
   }
 };
