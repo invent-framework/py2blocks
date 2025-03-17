@@ -19,11 +19,17 @@
       registerProcedureSerializer();
     </script>  
 
+    <script src="https://unpkg.com/@blockly/field-multilineinput@5.0.13/dist/index.js"></script>  
+    <script>
+      registerFieldMultilineInput();
+    </script>  
+
     <script type="module" src="/src/plugins/drag-strategy/drag-strategy.js"></script>
     <script type="module" src="/src/renderer/renderer.js"></script>
 
     <!-- Blocks -->
     <script type="module" src="/src/blocks/theme.js"></script>
+    <script type="module" src="/src/blocks/common/definitions.js"></script>
     <script type="module" src="/src/blocks/functions/definitions.js"></script>
     <script type="module" src="/src/blocks/variables/definitions.js"></script>
     <script type="module" src="/src/blocks/math/definitions.js"></script>
