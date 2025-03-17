@@ -49,6 +49,7 @@ async def test_unsupported_code():
     """
     python_code = "match x:\n    case 'Relevant':\n        return 1"
     result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_unsupported_code", result)
     assert result == {
         "blocks": {
             "blocks": [
