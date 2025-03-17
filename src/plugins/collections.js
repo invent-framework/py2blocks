@@ -53,7 +53,7 @@ export function createCollectionBlock(open_with, close_with, has_key_value=false
             }
 
             if (has_key_value) {
-                input.connection.setCheck('dict_item');
+                input.connection.setCheck(["dict_item", "dict_unpack"]);
             }
         },
     

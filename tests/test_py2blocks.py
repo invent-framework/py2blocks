@@ -527,8 +527,7 @@ async def test_bool_op():
     """
     python_code = "def test_function():\n    return True and False and True"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected bool_op block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_bool_op", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -552,7 +551,7 @@ async def test_bool_op():
                                                     "block": {
                                                         "type": "bool",
                                                         "fields": {
-                                                            "value": True
+                                                            "value": "True"
                                                         },
                                                     }
                                                 },
@@ -564,7 +563,7 @@ async def test_bool_op():
                                                                 "block": {
                                                                     "type": "bool",
                                                                     "fields": {
-                                                                        "value": False
+                                                                        "value": "False"
                                                                     },
                                                                 }
                                                             },
@@ -572,7 +571,7 @@ async def test_bool_op():
                                                                 "block": {
                                                                     "type": "bool",
                                                                     "fields": {
-                                                                        "value": True
+                                                                        "value": "True"
                                                                     },
                                                                 }
                                                             },
@@ -835,8 +834,7 @@ async def test_dict_with_pompoms_to_unpack():
     """
     python_code = 'd = {"a": 1}\nd2 = {"b": 2, **d}'
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected dict block for:
-    # render_blocks("test_dict_with_pompoms_to_unpack", result)
+    render_blocks("test_dict_with_pompoms_to_unpack", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -943,15 +941,15 @@ async def test_del_variable():
     """
     python_code = "del my_variable"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to create the expected list block for:
-    # render_blocks("test_bool_op", result)
+    render_blocks("test_del_variable", result)
     assert result == {
         "blocks": {
             "blocks": [
                 {
                     "type": "Delete",
+                    "extraState": {"items": 1},
                     "inputs": {
-                        "value": {
+                        "input_000001": {
                             "block": {
                                 "type": "Name",
                                 "fields": {"var": {"name": "my_variable"}},

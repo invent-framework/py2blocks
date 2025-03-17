@@ -365,7 +365,10 @@ def traverse_node(node):
         }
     elif isinstance(node, ast.Constant):
         block["type"] = type(node.value).__name__
-        block["fields"] = {"value": node.value}
+        if isinstance(node.value, bool):
+            block["fields"] = {"value": str(node.value)}
+        else:
+            block["fields"] = {"value": node.value}
     elif isinstance(node, ast.Expr):
         block = traverse_node(node.value)
     elif isinstance(node, ast.FormattedValue):
@@ -415,11 +418,10 @@ def traverse_node(node):
         }
         block["fields"] = {"var": {"name": node.targets[0].id}}
     elif isinstance(node, ast.Delete):
-        block["inputs"] = {
-            "value": {
-                "block": traverse_node(node.targets[0]),
-            },
-        }
+        block["extraState"] = {"items": len(node.targets)}
+        block["inputs"] = {}
+        for i, target in enumerate(node.targets, start=1):
+            block["inputs"][f"input_{i:06}"] = {"block": traverse_node(target)}
     elif isinstance(node, ast.AugAssign):
         block["inputs"] = {
             "value": {
