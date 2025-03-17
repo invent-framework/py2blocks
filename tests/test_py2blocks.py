@@ -987,3 +987,59 @@ async def test_basic_builtin_block():
             ]
         }
     }, result
+
+
+async def test_not_block():
+    """
+    Ensure that the NOT operator is converted to Blockly JSON correctly.
+    """
+    python_code = "not True"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to implement a NOT block
+    # render_blocks("test_not_block", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Not",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "bool",
+                                "fields": {"value": "True"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_unary_operator_that_is_not_NOT():
+    """
+    Ensure that a unary operator that is not the NOT operator is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "-1"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Josh to implement a UnaryOp block
+    # render_blocks("test_unary_operator_that_is_not_NOT", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "UnaryOp",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "int",
+                                "fields": {"value": 1},
+                            }
+                        }
+                    },
+                    "fields": {"op": "USub"},
+                }
+            ]
+        }
+    }, result

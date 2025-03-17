@@ -467,6 +467,21 @@ def traverse_node(node):
                 },
             }
         block["fields"] = {"op": type(node.op).__name__}
+    elif isinstance(node, ast.UnaryOp):
+        if isinstance(node.op, ast.Not):
+            block["type"] = "Not"
+            block["inputs"] = {
+                "value": {
+                    "block": traverse_node(node.operand),
+                },
+            }
+        else:
+            block["inputs"] = {
+                "value": {
+                    "block": traverse_node(node.operand),
+                },
+            }
+            block["fields"] = {"op": type(node.op).__name__}
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
