@@ -482,6 +482,49 @@ def traverse_node(node):
                 },
             }
             block["fields"] = {"op": type(node.op).__name__}
+    elif isinstance(node, ast.Compare):
+        # If there are two values, just use value[0] as left and value[1] as
+        # right input.
+        # If there are more than two values, use value[0] as left and create a
+        # new ast.BoolOp (with the remaining values), as the right input.
+        if len(node.ops) == 1:
+            block["inputs"] = {
+                "left": {
+                    "block": traverse_node(node.left),
+                },
+                "right": {
+                    "block": traverse_node(node.comparators[0]),
+                },
+            }
+        else:
+            block["inputs"] = {
+                "left": {
+                    "block": traverse_node(node.left),
+                },
+                "right": {
+                    "block": traverse_node(
+                        ast.Compare(
+                            left=node.comparators[0],
+                            ops=node.ops[1:],
+                            comparators=node.comparators[1:],
+                        )
+                    ),
+                },
+            }
+
+        block["fields"] = {"op": type(node.ops[0]).__name__}
+    elif isinstance(node, ast.IfExp):
+        block["inputs"] = {
+            "test": {
+                "block": traverse_node(node.test),
+            },
+            "body": {
+                "block": traverse_node(node.body),
+            },
+            "orelse": {
+                "block": traverse_node(node.orelse),
+            },
+        }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

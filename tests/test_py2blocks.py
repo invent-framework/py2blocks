@@ -1023,7 +1023,7 @@ async def test_unary_operator_that_is_not_NOT():
     python_code = "-1"
     result = json.loads(py2blocks.py2blocks(python_code))
     # TODO: Josh to implement a UnaryOp block
-    # render_blocks("test_unary_operator_that_is_not_NOT", result)
+    render_blocks("test_unary_operator_that_is_not_NOT", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -1038,6 +1038,95 @@ async def test_unary_operator_that_is_not_NOT():
                         }
                     },
                     "fields": {"op": "USub"},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_compare():
+    """
+    Ensure that a comparison is converted to Blockly JSON correctly.
+    """
+    python_code = "1 < 2 > 5"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_compare", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Compare",
+                    "inputs": {
+                        "left": {
+                            "block": {"type": "int", "fields": {"value": 1}}
+                        },
+                        "right": {
+                            "block": {
+                                "type": "Compare",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 5},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Gt"},
+                            }
+                        },
+                    },
+                    "fields": {"op": "Lt"},
+                }
+            ]
+        }
+    }, result
+
+async def test_if_exp():
+    """
+    Ensure that an if expression is converted to Blockly JSON correctly.
+    """
+    python_code = "x = 1 if True else 2"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_if_exp", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Assign",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "IfExp",
+                                "inputs": {
+                                    "test": {
+                                        "block": {
+                                            "type": "bool",
+                                            "fields": {"value": "True"},
+                                        }
+                                    },
+                                    "body": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    },
+                                    "orelse": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    },
+                    "fields": {"var": {"name": "x"}},
                 }
             ]
         }
