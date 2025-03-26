@@ -995,8 +995,7 @@ async def test_not_block():
     """
     python_code = "not True"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Josh to implement a NOT block
-    # render_blocks("test_not_block", result)
+    render_blocks("test_not_block", result)
     assert result == {
         "blocks": {
             "blocks": [

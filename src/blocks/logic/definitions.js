@@ -25,9 +25,20 @@ const BoolOp = {
           ]), 'op');
       this.appendValueInput('right');
       this.setInputsInline(true)
-	  this.setOutput(true, "BoolOp");
+	    this.setOutput(true, "BoolOp");
       this.setColour(logicColor);
     }
   };
 Blockly.common.defineBlocks({BoolOp: BoolOp});
   
+const Not = {
+  init: function() {
+    this.appendDummyInput('')
+      .appendField('not');
+    this.appendValueInput('value');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(logicColor);
+  }
+};
+Blockly.common.defineBlocks({Not: Not});
