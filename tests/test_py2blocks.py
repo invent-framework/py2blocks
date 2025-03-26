@@ -1043,3 +1043,29 @@ async def test_unary_operator_that_is_not_NOT():
             ]
         }
     }, result
+
+
+async def test_unary_NOT_operator():
+    """
+    Ensure that the NOT operator is converted to Blockly JSON correctly.
+    """
+    python_code = "not True"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_unary_NOT_operator", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Not",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "bool",
+                                "fields": {"value": "True"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
