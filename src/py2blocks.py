@@ -525,6 +525,50 @@ def traverse_node(node):
                 "block": traverse_node(node.orelse),
             },
         }
+    elif isinstance(node, ast.Attribute):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+        block["fields"] = {"attr": node.attr}
+    elif isinstance(node, ast.NamedExpr):
+        block["inputs"] = {
+            "target": {
+                "block": traverse_node(node.target),
+            },
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+    elif isinstance(node, ast.Subscript):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+        if isinstance(node.slice, ast.Tuple):
+            block["inputs"]["slice"] = {
+                "block": traverse_node(node.slice.elts[0])
+            }
+            block["inputs"]["slice"]["block"]["inputs"]["step"] = {
+                "block": traverse_node(node.slice.elts[1])
+            }
+        else:
+            block["inputs"]["slice"] = {"block": traverse_node(node.slice)}
+
+    elif isinstance(node, ast.Slice):
+        block["inputs"] = {
+            "lower": {
+                "block": traverse_node(node.lower),
+            },
+            "upper": {
+                "block": traverse_node(node.upper),
+            },
+            "step": {
+                "block": traverse_node(node.step),
+            },
+        }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

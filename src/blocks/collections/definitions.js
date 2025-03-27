@@ -45,3 +45,34 @@ const list_unpack = {
 };
 Blockly.common.defineBlocks({list_unpack: list_unpack});
   
+const Subscript = {
+  init: function() {
+    this.appendValueInput('value');
+    this.appendDummyInput('')
+      .appendField('[');
+    this.appendValueInput('slice');
+    this.appendDummyInput('')
+      .appendField(']');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(collectionsColor);
+  }
+};
+Blockly.common.defineBlocks({Subscript: Subscript});
+
+const Slice = {
+  init: function() {
+    this.appendValueInput('lower');
+    this.appendDummyInput('')
+      .appendField(':');
+    this.appendValueInput('upper');
+    this.appendDummyInput('')
+      .appendField(',');
+    this.appendValueInput('step');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(collectionsColor);
+  }
+};
+Blockly.common.defineBlocks({Slice: Slice});
+

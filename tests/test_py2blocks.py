@@ -1087,6 +1087,7 @@ async def test_compare():
         }
     }, result
 
+
 async def test_if_exp():
     """
     Ensure that an if expression is converted to Blockly JSON correctly.
@@ -1127,6 +1128,233 @@ async def test_if_exp():
                         }
                     },
                     "fields": {"var": {"name": "x"}},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_attribute():
+    """
+    Ensure that an attribute is converted to Blockly JSON correctly.
+    """
+    python_code = "x.y.z"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_attribute", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Attribute",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Attribute",
+                                "inputs": {
+                                    "value": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    }
+                                },
+                                "fields": {"attr": "y"},
+                            }
+                        }
+                    },
+                    "fields": {"attr": "z"},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_namedexpr():
+    """
+    Ensure that a named expression is converted to Blockly JSON correctly.
+    """
+    python_code = "print(x := 1)"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_namedexpr", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "print_block",
+                    "inputs": {
+                        "ARG0": {
+                            "block": {
+                                "type": "NamedExpr",
+                                "inputs": {
+                                    "target": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    },
+                                },
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_subscript_index():
+    """
+    Ensure that a subscript is converted to Blockly JSON correctly.
+    """
+    python_code = "x[0]"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_subscript", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Subscript",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "slice": {
+                            "block": {"type": "int", "fields": {"value": 0}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+async def test_subscript_dict_key():
+    """
+    Ensure that a subscript is converted to Blockly JSON correctly.
+    """
+    python_code = "x['key']"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_subscript", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Subscript",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "slice": {
+                            "block": {"type": "str", "fields": {"value": "key"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+async def test_slice_no_step():
+    """
+    Ensure that a slice is converted to Blockly JSON correctly.
+    """
+    python_code = "x[0:2]"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_slice", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Subscript",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "slice": {
+                            "block": {
+                                "type": "Slice",
+                                "inputs": {
+                                    "lower": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                    "upper": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                    "step": {"block": None},
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_slice_with_step():
+    """
+    Ensure that a slice is converted to Blockly JSON correctly.
+    """
+    python_code = "x[0:2,3]"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_slice", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Subscript",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "slice": {
+                            "block": {
+                                "type": "Slice",
+                                "inputs": {
+                                    "lower": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                    "upper": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                    "step": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 3},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
                 }
             ]
         }

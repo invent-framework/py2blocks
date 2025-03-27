@@ -82,3 +82,16 @@ const IfExp = {
   }
 };
 Blockly.common.defineBlocks({IfExp: IfExp});
+
+const NamedExpr = {
+  init: function() {
+    this.appendValueInput('target');
+    this.appendDummyInput('')
+      .appendField(':=');
+    this.appendValueInput('value');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(logicColor);
+  }
+};
+Blockly.common.defineBlocks({NamedExpr: NamedExpr});

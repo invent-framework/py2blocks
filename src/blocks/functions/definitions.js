@@ -207,3 +207,17 @@ const keyword = {
 	}
 };
 Blockly.common.defineBlocks({keyword: keyword});  
+
+const Attribute = {
+	init: function() {
+	  this.appendValueInput('value');
+	  this.appendDummyInput('')
+		.appendField('.')
+		.appendField(new Blockly.FieldTextInput(''), 'attr');
+	  this.setInputsInline(true)
+	  this.setOutput(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({Attribute: Attribute});
+  
