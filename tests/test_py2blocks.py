@@ -1236,6 +1236,7 @@ async def test_subscript_index():
         }
     }, result
 
+
 async def test_subscript_dict_key():
     """
     Ensure that a subscript is converted to Blockly JSON correctly.
@@ -1256,13 +1257,17 @@ async def test_subscript_dict_key():
                             }
                         },
                         "slice": {
-                            "block": {"type": "str", "fields": {"value": "key"}}
+                            "block": {
+                                "type": "str",
+                                "fields": {"value": "key"},
+                            }
                         },
                     },
                 }
             ]
         }
     }, result
+
 
 async def test_slice_no_step():
     """
@@ -1359,3 +1364,19 @@ async def test_slice_with_step():
             ]
         }
     }, result
+
+async def test_list_comp():
+    result = {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "ListComp",
+                    "extraState": {
+                        "items": 1,
+                    }
+                }
+            ]
+        }
+    }
+    render_blocks("test_list_comp", result)
+    assert True

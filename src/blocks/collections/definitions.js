@@ -1,4 +1,4 @@
-import { createCollectionBlock } from "../../plugins/collections.js";
+import { createCollectionBlock, createComprehensionBlock } from "../../plugins/collections.js";
 
 const collectionsColor = "#ff9966";
 
@@ -76,3 +76,28 @@ const Slice = {
 };
 Blockly.common.defineBlocks({Slice: Slice});
 
+const IfExp = {
+  init: function() {
+    this.appendValueInput('body');
+    this.appendDummyInput('')
+      .appendField('if');
+    this.appendValueInput('test');
+    this.appendDummyInput('')
+      .appendField('else');
+    this.appendValueInput('orelse');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(logicColor);
+  }
+};
+Blockly.common.defineBlocks({IfExp: IfExp});
+
+Blockly.Blocks["ListComp"] = createComprehensionBlock("[", "]");
+Blockly.Blocks["SetComp"] = createComprehensionBlock("{", "}");
+Blockly.Blocks["DictComp"] = createComprehensionBlock("{", "}");
+Blockly.Blocks["GeneratorExp"] = createComprehensionBlock("(", ")");
+
+Blockly.Blocks["ListCompIf"] = createComprehensionBlock("[", "]", true);
+Blockly.Blocks["SetCompIf"] = createComprehensionBlock("{", "}", true);
+Blockly.Blocks["DictCompIf"] = createComprehensionBlock("{", "}", true);
+Blockly.Blocks["GeneratorExpIf"] = createComprehensionBlock("(", ")", true);
