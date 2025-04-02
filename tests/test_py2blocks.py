@@ -1365,18 +1365,548 @@ async def test_slice_with_step():
         }
     }, result
 
+
 async def test_list_comp():
-    result = {
+    """
+    Ensure that a basic list comprehension is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "[x*2 for x in collection]"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_list_comp", result)
+    assert result == {
         "blocks": {
             "blocks": [
                 {
                     "type": "ListComp",
-                    "extraState": {
-                        "items": 1,
-                    }
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                    },
                 }
             ]
         }
-    }
-    render_blocks("test_list_comp", result)
-    assert True
+    }, result
+
+
+async def test_list_comp_with_if():
+    """
+    Ensure that a list comprehension with an if clause is converted to Blockly
+    JSON correctly.
+    """
+    python_code = "[x*2 for x in collection if x > 0]"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_list_comp_with_if", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "ListCompIf",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "if_000001": {
+                            "block": {
+                                "type": "Compare",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Gt"},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_dict_comp():
+    """
+    Ensure that a basic dict comprehension is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "{v: v*2 for v in collection}"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_dict_comp", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "DictComp",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "dict_item",
+                                "inputs": {
+                                    "key": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "BinOp",
+                                            "inputs": {
+                                                "left": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "v"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                "right": {
+                                                    "block": {
+                                                        "type": "int",
+                                                        "fields": {"value": 2},
+                                                    }
+                                                },
+                                            },
+                                            "fields": {"op": "Mult"},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "v"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_dict_comp_with_if():
+    """
+    Ensure that a dict comprehension with an if clause is converted to Blockly
+    JSON correctly.
+    """
+    python_code = "{v: v*2 for v in collection if v > 0}"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_dict_comp_with_if", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "DictCompIf",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "dict_item",
+                                "inputs": {
+                                    "key": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "value": {
+                                        "block": {
+                                            "type": "BinOp",
+                                            "inputs": {
+                                                "left": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "v"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                "right": {
+                                                    "block": {
+                                                        "type": "int",
+                                                        "fields": {"value": 2},
+                                                    }
+                                                },
+                                            },
+                                            "fields": {"op": "Mult"},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "v"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "if_000001": {
+                            "block": {
+                                "type": "Compare",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Gt"},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_set_comprehension():
+    """
+    Ensure that a basic set comprehension is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "{v*2 for v in collection}"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_set_comprehension", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "SetComp",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "v"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_set_comprehension_with_if():
+    """
+    Ensure that a set comprehension with an if clause is converted to Blockly
+    JSON correctly.
+    """
+    python_code = "{v*2 for v in collection if v > 0}"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_set_comprehension_with_if", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "SetCompIf",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "v"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "if_000001": {
+                            "block": {
+                                "type": "Compare",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "v"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Gt"},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_generator_exp():
+    """
+    Ensure that a basic generator expression is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "(x*2 for x in collection)"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_generator_exp", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "GeneratorExp",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_generator_exp_with_if():
+    """
+    Ensure that a generator expression with an if clause is converted to Blockly
+    JSON correctly.
+    """
+    python_code = "(x*2 for x in collection if x > 0)"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_generator_exp_with_if", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "GeneratorExpIf",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "elt": {
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Mult"},
+                            }
+                        },
+                        "target_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "if_000001": {
+                            "block": {
+                                "type": "Compare",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 0},
+                                        }
+                                    },
+                                },
+                                "fields": {"op": "Gt"},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result

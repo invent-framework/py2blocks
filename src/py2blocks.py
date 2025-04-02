@@ -569,6 +569,47 @@ def traverse_node(node):
                 "block": traverse_node(node.step),
             },
         }
+    elif isinstance(
+        node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)
+    ):
+        block["extraState"] = {"items": len(node.generators)}
+        if isinstance(node, ast.DictComp):
+            block["inputs"] = {
+                "elt": {
+                    "block": {
+                        "type": "dict_item",
+                        "inputs": {
+                            "key": {
+                                "block": traverse_node(node.key),
+                            },
+                            "value": {
+                                "block": traverse_node(node.value),
+                            },
+                        },
+                    }
+                },
+            }
+        else:
+            block["inputs"] = {
+                "elt": {
+                    "block": traverse_node(node.elt),
+                }
+            }
+
+        for i, gen in enumerate(node.generators, start=1):
+            # Create a new target and iter
+            block["inputs"][f"target_{i:06}"] = {
+                "block": traverse_node(gen.target),
+            }
+            block["inputs"][f"iter_{i:06}"] = {
+                "block": traverse_node(gen.iter)
+            }
+            if gen.ifs:
+                # Generate ListCompIf
+                block["type"] = f"{block['type']}If"
+                block["inputs"][f"if_{i:06}"] = {
+                    "block": traverse_node(gen.ifs[0])
+                }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
