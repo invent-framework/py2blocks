@@ -410,13 +410,6 @@ def traverse_node(node):
                         },
                     }
                 }
-    elif isinstance(node, ast.Assign):
-        block["inputs"] = {
-            "value": {
-                "block": traverse_node(node.value),
-            },
-        }
-        block["fields"] = {"var": {"name": node.targets[0].id}}
     elif isinstance(node, ast.Delete):
         block["extraState"] = {"items": len(node.targets)}
         block["inputs"] = {}
@@ -610,6 +603,13 @@ def traverse_node(node):
                 block["inputs"][f"if_{i:06}"] = {
                     "block": traverse_node(gen.ifs[0])
                 }
+    elif isinstance(node, ast.Assign):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
+        block["fields"] = {"var": {"name": node.targets[0].id}}
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

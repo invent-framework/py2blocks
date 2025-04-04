@@ -1910,3 +1910,27 @@ async def test_generator_exp_with_if():
             ]
         }
     }, result
+
+
+async def test_assign():
+    """
+    Ensure that an assignment is converted to Blockly JSON correctly.
+    """
+    python_code = "x = 1"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_assign", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Assign",
+                    "inputs": {
+                        "value": {
+                            "block": {"type": "int", "fields": {"value": 1}}
+                        }
+                    },
+                    "fields": {"var": {"name": "x"}},
+                }
+            ]
+        }
+    }, result
