@@ -153,14 +153,19 @@ async def test_function_no_args_with_body_with_return():
                         "body": {
                             "block": {
                                 "type": "Assign",
-                                "fields": {"var": {"name": "x"}},
                                 "inputs": {
+                                    "target": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
                                     "value": {
                                         "block": {
                                             "type": "int",
                                             "fields": {"value": 1},
                                         }
-                                    }
+                                    },
                                 },
                                 "next": {
                                     "block": {
@@ -213,6 +218,12 @@ async def test_function_with_args_with_body_with_return():
                             "block": {
                                 "type": "Assign",
                                 "inputs": {
+                                    "target": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "y"}},
+                                        }
+                                    },
                                     "value": {
                                         "block": {
                                             "type": "BinOp",
@@ -236,9 +247,8 @@ async def test_function_with_args_with_body_with_return():
                                             },
                                             "fields": {"op": "Add"},
                                         }
-                                    }
+                                    },
                                 },
-                                "fields": {"var": {"name": "y"}},
                                 "next": {
                                     "block": {
                                         "type": "Return",
@@ -841,6 +851,12 @@ async def test_dict_with_pompoms_to_unpack():
                 {
                     "type": "Assign",
                     "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "d"}},
+                            }
+                        },
                         "value": {
                             "block": {
                                 "type": "Dict",
@@ -869,13 +885,18 @@ async def test_dict_with_pompoms_to_unpack():
                                     }
                                 },
                             }
-                        }
+                        },
                     },
-                    "fields": {"var": {"name": "d"}},
                     "next": {
                         "block": {
                             "type": "Assign",
                             "inputs": {
+                                "target": {
+                                    "block": {
+                                        "type": "Name",
+                                        "fields": {"var": {"name": "d2"}},
+                                    }
+                                },
                                 "value": {
                                     "block": {
                                         "type": "Dict",
@@ -923,9 +944,8 @@ async def test_dict_with_pompoms_to_unpack():
                                             },
                                         },
                                     }
-                                }
+                                },
                             },
-                            "fields": {"var": {"name": "d2"}},
                         }
                     },
                 }
@@ -1101,6 +1121,12 @@ async def test_if_exp():
                 {
                     "type": "Assign",
                     "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
                         "value": {
                             "block": {
                                 "type": "IfExp",
@@ -1125,9 +1151,8 @@ async def test_if_exp():
                                     },
                                 },
                             }
-                        }
+                        },
                     },
-                    "fields": {"var": {"name": "x"}},
                 }
             ]
         }
@@ -1925,12 +1950,89 @@ async def test_assign():
                 {
                     "type": "Assign",
                     "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
                         "value": {
                             "block": {"type": "int", "fields": {"value": 1}}
-                        }
+                        },
                     },
-                    "fields": {"var": {"name": "x"}},
                 }
             ]
         }
     }, result
+
+
+async def test_assign_with_tuple():
+    """
+    Ensure that an assignment with a tuple is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "x, y = 1, 2"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_assign_with_tuple", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Assign",
+                    "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Tuple",
+                                "extraState": {"items": 2},
+                                "inputs": {
+                                    "input_000001": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "input_000002": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "y"}},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "value": {
+                            "block": {
+                                "type": "Tuple",
+                                "extraState": {"items": 2},
+                                "inputs": {
+                                    "input_000001": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    },
+                                    "input_000002": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 2},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+async def test_assign_with_multiple_targets():
+    """
+    Ensure that an assignment with multiple targets is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "x = y = 1"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # TODO: Create new multiple assignment block
+    render_blocks("test_assign_with_multiple_targets", result)
+    assert result == {}, result
