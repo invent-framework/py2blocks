@@ -2026,6 +2026,7 @@ async def test_assign_with_tuple():
         }
     }, result
 
+
 async def test_assign_with_multiple_targets():
     """
     Ensure that an assignment with multiple targets is converted to Blockly JSON
@@ -2036,3 +2037,203 @@ async def test_assign_with_multiple_targets():
     # TODO: Create new multiple assignment block
     render_blocks("test_assign_with_multiple_targets", result)
     assert result == {}, result
+
+
+async def test_raise():
+    """
+    Ensure that a raise statement is converted to Blockly JSON correctly.
+    """
+    python_code = "raise x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_raise", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Raise",
+                    "inputs": {
+                        "exc": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_raise_from():
+    """
+    Ensure that a raise statement with from is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "raise x from y"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_raise_from", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "RaiseFrom",
+                    "inputs": {
+                        "exc": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "cause": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_assert():
+    """
+    Ensure that an assert statement is converted to Blockly JSON correctly.
+    """
+    python_code = "assert x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_assert", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Assert",
+                    "inputs": {
+                        "test": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_assert_with_msg():
+    """
+    Ensure that an assert statement with a message is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "assert x, 'message'"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_assert_with_msg", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "AssertWithMsg",
+                    "inputs": {
+                        "test": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "msg": {
+                            "block": {
+                                "type": "str",
+                                "fields": {"value": "message"},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_import():
+    """
+    Ensure that an import statement is converted to Blockly JSON correctly.
+    """
+    python_code = "import os"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_import", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Import",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {
+                                "type": "alias",
+                                "fields": {"name": "os"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_import_as():
+    """
+    Ensure that an import as statement is converted to Blockly JSON correctly.
+    """
+    python_code = "import os as operating_system"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_import_as", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Import",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {
+                                "type": "alias",
+                                "fields": {"name": "os as operating_system"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_import_from():
+    """
+    Ensure that an import from statement is converted to Blockly JSON correctly.
+    """
+    python_code = "from os import path"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_import_from", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "ImportFrom",
+                    "fields": {"module": "os"},
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {
+                                "type": "alias",
+                                "fields": {"name": "path"},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result

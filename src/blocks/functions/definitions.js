@@ -221,3 +221,54 @@ const Attribute = {
 };
 Blockly.common.defineBlocks({Attribute: Attribute});
   
+const Raise = {
+	init: function() {
+	  this.appendValueInput('exc')
+		.appendField('raise');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setNextStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+  };
+Blockly.common.defineBlocks({Raise: Raise});
+  
+const RaiseFrom = {
+	init: function() {
+	  this.appendValueInput('exc')
+		.appendField('raise');
+	  this.appendValueInput('cause')
+		.appendField('from');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setNextStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({RaiseFrom: RaiseFrom});
+
+const Assert = {
+	init: function() {
+	  this.appendValueInput('test')
+		.appendField('assert');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setNextStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+  };
+Blockly.common.defineBlocks({Assert: Assert});
+
+const AssertWithMsg = {
+	init: function() {
+	  this.appendValueInput('test')
+		.appendField('assert');
+	  this.appendValueInput('msg')
+		.appendField(',');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setNextStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+  };
+Blockly.common.defineBlocks({AssertWithMsg: AssertWithMsg});  

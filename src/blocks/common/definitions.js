@@ -10,3 +10,13 @@ const catch_all = {
 };
 Blockly.common.defineBlocks({catch_all: catch_all});
                       
+const alias = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField(new Blockly.FieldTextInput(''), 'name');
+    this.setInputsInline(true)
+    this.setOutput(true, "alias");
+    this.setColour("#ffffff");
+  }
+};
+Blockly.common.defineBlocks({alias: alias});

@@ -1,12 +1,13 @@
-import { createCollectionBlock, createComprehensionBlock } from "../../plugins/collections.js";
+import { createPlusMinusBlock } from "../../plugins/plus-minus.js";
+import { createComprehensionBlock } from "../../plugins/collections.js";
 
 const collectionsColor = "#ff9966";
 
-Blockly.Blocks["List"] = createCollectionBlock("[", "]");
-Blockly.Blocks["Tuple"] = createCollectionBlock("(", ")");
-Blockly.Blocks["Set"] = createCollectionBlock("{", "}");
-Blockly.Blocks["Dict"] = createCollectionBlock("{", "}", true);
-Blockly.Blocks["Delete"] = createCollectionBlock("del", "");
+Blockly.Blocks["List"] = createPlusMinusBlock("[", "]");
+Blockly.Blocks["Tuple"] = createPlusMinusBlock("(", ")");
+Blockly.Blocks["Set"] = createPlusMinusBlock("{", "}");
+Blockly.Blocks["Dict"] = createPlusMinusBlock("{", "}", "dict_item", ["dict_item", "dict_unpack"]);
+Blockly.Blocks["Delete"] = createPlusMinusBlock("del", "");
 
 const dict_item = {
     init: function() {

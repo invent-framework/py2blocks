@@ -612,6 +612,49 @@ def traverse_node(node):
                 "block": traverse_node(node.value),
             },
         }
+    elif isinstance(node, ast.Raise):
+        block["inputs"] = {
+            "exc": {
+                "block": traverse_node(node.exc),
+            }
+        }
+
+        if node.cause:
+            block["type"] = "RaiseFrom"
+            block["inputs"]["cause"] = {
+                "block": traverse_node(node.cause),
+            }
+    elif isinstance(node, ast.Assert):
+        block["inputs"] = {
+            "test": {
+                "block": traverse_node(node.test),
+            }
+        }
+
+        if node.msg:
+            block["type"] = "AssertWithMsg"
+            block["inputs"]["msg"] = {
+                "block": traverse_node(node.msg),
+            }
+    elif isinstance(node, ast.alias):
+        block["fields"] = {"name": node.name}
+        if node.asname:
+            block["fields"] = {"name": f"{node.name} as {node.asname}"}
+    elif isinstance(node, ast.Import):
+        block["extraState"] = {"items": len(node.names)}
+        block["inputs"] = {}
+        for i, alias in enumerate(node.names, start=1):
+            block["inputs"][f"input_{i:06}"] = {
+                "block": traverse_node(alias),
+            }
+    elif isinstance(node, ast.ImportFrom):
+        block["fields"] = {"module": node.module}
+        block["extraState"] = {"items": len(node.names)}
+        block["inputs"] = {}
+        for i, alias in enumerate(node.names, start=1):
+            block["inputs"][f"input_{i:06}"] = {
+                "block": traverse_node(alias),
+            }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
