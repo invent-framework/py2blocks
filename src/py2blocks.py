@@ -111,6 +111,35 @@ def traverse_body(body):
     return block
 
 
+def traverse_else(
+    else_body,
+    else_inputs,
+    count=1,
+):
+    """
+    Traverse the else / elif body of a node in the AST and generate the Blockly
+    JSON. The else_inputs dictionary is where the results are stored as a key
+    like "elif_0000001" and value containing the input definition. The count
+    argument ensures we can keep track of the number of elifs and else blocks
+    we have traversed.
+    """
+    node = else_body[0]
+    if isinstance(node, ast.If):
+        # If this is an elif, we need to traverse the test and body.
+        else_inputs["elif_%06d" % count] = {
+            "block": traverse_node(node.test),
+        }
+        else_inputs["elif_%06d_body" % count] = {
+            "block": traverse_body(node.body)
+        }
+        if node.orelse:
+            # If there's an else or elif, we need to traverse that too.
+            traverse_else(node.orelse, else_inputs, count + 1)
+    else:
+        # This is the else block. We need to traverse the body.
+        else_inputs["else_body"] = {"block": traverse_body(else_body)}
+
+
 def register_builtin_block(name, template):
     """
     Register a new built-in function with its block template.
@@ -662,8 +691,21 @@ def traverse_node(node):
             },
             "if_body": {
                 "block": traverse_body(node.body),
-            }
+            },
         }
+        if node.orelse:
+            inputs = {}
+            traverse_else(node.orelse, inputs)
+            block["inputs"].update(inputs)
+            block["extraState"] = {}
+            block["extraState"]["elseIfCount"] = len(
+                [
+                    k
+                    for k in inputs.keys()
+                    if k.startswith("elif_") and not k.endswith("_body")
+                ]
+            )
+            block["extraState"]["hasElse"] = "else_body" in inputs
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

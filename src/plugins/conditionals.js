@@ -34,8 +34,7 @@ export function createIfBlock() {
 
         loadExtraState: function (state) {
             const targetCount = state['elseIfCount'] || 0;
-            this.hasElse_ = state['hasElse'] || false;
-            if (this.hasElse_ && !this.getInput('else')) {
+            if (state['hasElse']) {
                 this.addElse_();
             }
             this.updateShape_(targetCount);

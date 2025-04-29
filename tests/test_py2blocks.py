@@ -2027,6 +2027,7 @@ async def test_assign_with_tuple():
     }, result
 
 
+@upytest.skip("Awaiting Josh to implement multi-assignement block.")
 async def test_assign_with_multiple_targets():
     """
     Ensure that an assignment with multiple targets is converted to Blockly JSON
@@ -2034,7 +2035,7 @@ async def test_assign_with_multiple_targets():
     """
     python_code = "x = y = 1"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # TODO: Create new multiple assignment block
+    # TODO: Create new multiple assignment block. THIS IS FOR JOSH! ;-)
     render_blocks("test_assign_with_multiple_targets", result)
     assert result == {}, result
 
@@ -2239,9 +2240,9 @@ async def test_import_from():
     }, result
 
 
-async def test_if():
+async def test_if_simple():
     """
-    Ensure that an if statement is converted to Blockly JSON correctly.
+    Ensure that a simple if statement is converted to Blockly JSON correctly.
     """
     python_code = "if x: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
@@ -2252,18 +2253,115 @@ async def test_if():
                 {
                     "type": "If",
                     "inputs": {
-                        "test": {
+                        "if": {
                             "block": {
                                 "type": "Name",
                                 "fields": {"var": {"name": "x"}},
                             }
                         },
-                        "body": {
+                        "if_body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_if_else():
+    """
+    Ensure that an if-else statement is converted to Blockly JSON correctly.
+    """
+    python_code = "if x: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_if_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "If",
+                    "inputs": {
+                        "if": {
                             "block": {
-                                "type": "Pass",
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
                             }
                         },
+                        "if_body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
                     },
+                    "extraState": {"elseIfCount": 0, "hasElse": True},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_if_elif_else():
+    """
+    Ensure that an if-elif-else statement is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "if x: pass\nelif y: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_if_elif_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "If",
+                    "inputs": {
+                        "if": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "if_body": {"block": {"type": "Pass"}},
+                        "elif_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "elif_000001_body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"elseIfCount": 1, "hasElse": True},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_if_elif():
+    """
+    Ensure that an if-elif statement is converted to Blockly JSON correctly.
+    """
+    python_code = "if x: pass\nelif y: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_if_elif", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "If",
+                    "inputs": {
+                        "if": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "if_body": {"block": {"type": "Pass"}},
+                        "elif_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "elif_000001_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"elseIfCount": 1, "hasElse": False},
                 }
             ]
         }
