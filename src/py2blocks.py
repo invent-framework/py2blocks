@@ -655,6 +655,15 @@ def traverse_node(node):
             block["inputs"][f"input_{i:06}"] = {
                 "block": traverse_node(alias),
             }
+    elif isinstance(node, ast.If):
+        block["inputs"] = {
+            "if": {
+                "block": traverse_node(node.test),
+            },
+            "if_body": {
+                "block": traverse_body(node.body),
+            }
+        }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

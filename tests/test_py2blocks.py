@@ -2237,3 +2237,34 @@ async def test_import_from():
             ]
         }
     }, result
+
+
+async def test_if():
+    """
+    Ensure that an if statement is converted to Blockly JSON correctly.
+    """
+    python_code = "if x: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_if", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "If",
+                    "inputs": {
+                        "test": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "body": {
+                            "block": {
+                                "type": "Pass",
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
