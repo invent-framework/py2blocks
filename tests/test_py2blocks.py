@@ -2552,7 +2552,7 @@ async def test_try_except():
     """
     python_code = "try: pass\nexcept: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except", result)
+    render_blocks("test_try_except", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2563,7 +2563,7 @@ async def test_try_except():
                         "handler_000001": {"block": None},
                         "handler_000001_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2577,7 +2577,7 @@ async def test_try_except_with_exception():
     """
     python_code = "try: pass\nexcept Exception: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except_with_exception", result)
+    render_blocks("test_try_except_with_exception", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2593,7 +2593,7 @@ async def test_try_except_with_exception():
                         },
                         "handler_000001_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2607,7 +2607,7 @@ async def test_try_except_with_exception_as():
     """
     python_code = "try: pass\nexcept Exception as e: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except_with_exception_as", result)
+    render_blocks("test_try_except_with_exception_as", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2617,19 +2617,27 @@ async def test_try_except_with_exception_as():
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
                             "block": {
-                                "type": "Name",
-                                "fields": {"var": {"name": "Exception"}},
-                            }
-                        },
-                        "handler_000001_body": {"block": {"type": "Pass"}},
-                        "handler_000001_as": {
-                            "block": {
-                                "type": "Name",
-                                "fields": {"var": {"name": "e"}},
+                                "type": "ExceptAs",
+                                "inputs": {
+                                    "type": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "Exception"}
+                                            },
+                                        }
+                                    },
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": "e"},
+                                        }
+                                    },
+                                },
                             }
                         },
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2643,7 +2651,7 @@ async def test_try_except_with_multiple_exceptions():
     """
     python_code = "try: pass\nexcept (ValueError, TypeError): pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except_with_multiple_exceptions", result)
+    render_blocks("test_try_except_with_multiple_exceptions", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2677,7 +2685,7 @@ async def test_try_except_with_multiple_exceptions():
                         },
                         "handler_000001_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2691,7 +2699,7 @@ async def test_try_except_with_multiple_exceptions_as():
     """
     python_code = "try: pass\nexcept (ValueError, TypeError) as e: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except_with_multiple_exceptions_as", result)
+    render_blocks("test_try_except_with_multiple_exceptions_as", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2701,37 +2709,47 @@ async def test_try_except_with_multiple_exceptions_as():
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
                             "block": {
-                                "type": "Tuple",
-                                "extraState": {"items": 2},
+                                "type": "ExceptAs",
                                 "inputs": {
-                                    "input_000001": {
+                                    "type": {
                                         "block": {
-                                            "type": "Name",
-                                            "fields": {
-                                                "var": {"name": "ValueError"}
+                                            "type": "Tuple",
+                                            "extraState": {"items": 2},
+                                            "inputs": {
+                                                "input_000001": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "ValueError"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                "input_000002": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "TypeError"
+                                                            }
+                                                        },
+                                                    }
+                                                },
                                             },
                                         }
                                     },
-                                    "input_000002": {
+                                    "name": {
                                         "block": {
                                             "type": "Name",
-                                            "fields": {
-                                                "var": {"name": "TypeError"}
-                                            },
+                                            "fields": {"var": "e"},
                                         }
                                     },
                                 },
                             }
                         },
-                        "handler_000001_body": {"block": {"type": "Pass"}},
-                        "handler_000001_as": {
-                            "block": {
-                                "type": "Name",
-                                "fields": {"var": {"name": "e"}},
-                            }
-                        },
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2745,7 +2763,7 @@ async def test_try_except_with_finally():
     """
     python_code = "try: pass\nexcept: pass\nfinally: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_except_with_finally", result)
+    render_blocks("test_try_except_with_finally", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2757,7 +2775,7 @@ async def test_try_except_with_finally():
                         "handler_000001_body": {"block": {"type": "Pass"}},
                         "finally_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2771,7 +2789,7 @@ async def test_try_with_else():
     """
     python_code = "try: pass\nexcept: pass\nelse: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_with_else", result)
+    render_blocks("test_try_with_else", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2783,7 +2801,7 @@ async def test_try_with_else():
                         "handler_000001_body": {"block": {"type": "Pass"}},
                         "else_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2797,7 +2815,7 @@ async def test_try_with_else_and_finally():
     """
     python_code = "try: pass\nexcept: pass\nelse: pass\nfinally: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_try_with_else_and_finally", result)
+    render_blocks("test_try_with_else_and_finally", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2810,7 +2828,7 @@ async def test_try_with_else_and_finally():
                         "else_body": {"block": {"type": "Pass"}},
                         "finally_body": {"block": {"type": "Pass"}},
                     },
-                    "extraState": {"handlers": 1},
+                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
