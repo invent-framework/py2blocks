@@ -361,7 +361,7 @@ def traverse_node(node):
     # Traverse the node and generate the Blockly JSON.
     if node is None:
         return node
-    elif isinstance(node, ast.Pass):
+    elif isinstance(node, (ast.Pass, ast.Break, ast.Continue)):
         return block
     elif isinstance(node, ast.FunctionDef):
         block["extraState"] = {
@@ -706,6 +706,37 @@ def traverse_node(node):
                 ]
             )
             block["extraState"]["hasElse"] = "else_body" in inputs
+    elif isinstance(node, ast.For):
+        block["inputs"] = {
+            "target": {
+                "block": traverse_node(node.target),
+            },
+            "iter": {
+                "block": traverse_node(node.iter),
+            },
+            "body": {
+                "block": traverse_body(node.body),
+            },
+        }
+        if node.orelse:
+            block["type"] = "ForElse"
+            block["inputs"]["else_body"] = {
+                "block": traverse_body(node.orelse),
+            }
+    elif isinstance(node, ast.While):
+        block["inputs"] = {
+            "test": {
+                "block": traverse_node(node.test),
+            },
+            "body": {
+                "block": traverse_body(node.body),
+            },
+        }
+        if node.orelse:
+            block["type"] = "WhileElse"
+            block["inputs"]["else_body"] = {
+                "block": traverse_body(node.orelse),
+            }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

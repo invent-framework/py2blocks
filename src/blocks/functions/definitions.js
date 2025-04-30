@@ -173,16 +173,6 @@ const Argument = {
 };
 Blockly.common.defineBlocks({Argument: Argument});
   
-const Pass = {
-    init: function() {
-      this.appendDummyInput()
-        .appendField('pass');
-      this.setPreviousStatement(true, null);
-      this.setColour(functionsColor);
-    }
-};
-Blockly.common.defineBlocks({Pass: Pass});
-  
 const Return = {
   init: function() {
     this.appendDummyInput()

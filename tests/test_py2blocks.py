@@ -2366,3 +2366,163 @@ async def test_if_elif():
             ]
         }
     }, result
+
+
+async def test_for():
+    """
+    Ensure that a for loop is converted to Blockly JSON correctly.
+    """
+    python_code = "for x in collection: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_for", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "For",
+                    "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_for_else():
+    """
+    Ensure that a for loop with an else clause is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "for x in collection: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_for_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "ForElse",
+                    "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "collection"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_while():
+    """
+    Ensure that a while loop is converted to Blockly JSON correctly.
+    """
+    python_code = "while x: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_while", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "While",
+                    "inputs": {
+                        "test": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_while_else():
+    """
+    Ensure that a while loop with an else clause is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "while x: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_while_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "WhileElse",
+                    "inputs": {
+                        "test": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_break():
+    """
+    Ensure that a break statement is converted to Blockly JSON correctly.
+    """
+    python_code = "break"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_break", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Break",
+                }
+            ]
+        }
+    }, result
+
+
+async def test_continue():
+    """
+    Ensure that a continue statement is converted to Blockly JSON correctly.
+    """
+    python_code = "continue"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_continue", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Continue",
+                }
+            ]
+        }
+    }, result

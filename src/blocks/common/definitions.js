@@ -20,3 +20,35 @@ const alias = {
   }
 };
 Blockly.common.defineBlocks({alias: alias});
+
+const Pass = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField('pass');
+    this.setPreviousStatement(true, null);
+    this.setColour("#ff0066");
+  }
+};
+Blockly.common.defineBlocks({Pass: Pass});
+
+  
+const Break = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField('break');
+    this.setPreviousStatement(true, null);
+    this.setColour("#ff0066");
+  }
+};
+Blockly.common.defineBlocks({Break: Break});
+
+
+const Continue = {
+  init: function() {
+    this.appendDummyInput()
+      .appendField('continue');
+    this.setPreviousStatement(true, null);
+    this.setColour("#ff0066");
+  }
+};
+Blockly.common.defineBlocks({Continue: Continue});
