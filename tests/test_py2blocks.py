@@ -2374,7 +2374,7 @@ async def test_for():
     """
     python_code = "for x in collection: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_for", result)
+    render_blocks("test_for", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2408,7 +2408,7 @@ async def test_for_else():
     """
     python_code = "for x in collection: pass\nelse: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_for_else", result)
+    render_blocks("test_for_else", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2442,7 +2442,7 @@ async def test_while():
     """
     python_code = "while x: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_while", result)
+    render_blocks("test_while", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2470,7 +2470,7 @@ async def test_while_else():
     """
     python_code = "while x: pass\nelse: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_while_else", result)
+    render_blocks("test_while_else", result)
     assert result == {
         "blocks": {
             "blocks": [
