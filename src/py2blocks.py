@@ -737,6 +737,46 @@ def traverse_node(node):
             block["inputs"]["else_body"] = {
                 "block": traverse_body(node.orelse),
             }
+    elif isinstance(node, ast.Try):
+        block["inputs"] = {
+            "body": {
+                "block": traverse_body(node.body),
+            },
+        }
+        block["extraState"] = {}
+        if node.orelse:
+            block["type"] = "TryElse"
+            block["inputs"]["else_body"] = {
+                "block": traverse_body(node.orelse),
+            }
+        if node.finalbody:
+            block["type"] = "TryFinally"
+            block["inputs"]["finally_body"] = {
+                "block": traverse_body(node.finalbody),
+            }
+        if node.finalbody and node.orelse:
+            block["type"] = "TryElseFinally"
+            block["inputs"]["else_body"] = {
+                "block": traverse_body(node.orelse),
+            }
+            block["inputs"]["finally_body"] = {
+                "block": traverse_body(node.finalbody),
+            }
+        for i, handler in enumerate(node.handlers, start=1):
+            block["inputs"][f"handler_{i:06}"] = {
+                "block": traverse_node(handler.type),
+            }
+            block["inputs"][f"handler_{i:06}_body"] = {
+                "block": traverse_body(handler.body),
+            }
+            if handler.name:
+                block["inputs"][f"handler_{i:06}_as"] = {
+                    "block": {
+                        "type": "Name",
+                        "fields": {"var": {"name": handler.name}},
+                    }
+                }
+        block["extraState"]["handlers"] = len(node.handlers)
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

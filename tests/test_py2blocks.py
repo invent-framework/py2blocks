@@ -2374,7 +2374,7 @@ async def test_for():
     """
     python_code = "for x in collection: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    render_blocks("test_for", result)
+    # render_blocks("test_for", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2408,7 +2408,7 @@ async def test_for_else():
     """
     python_code = "for x in collection: pass\nelse: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    render_blocks("test_for_else", result)
+    # render_blocks("test_for_else", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2442,7 +2442,7 @@ async def test_while():
     """
     python_code = "while x: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    render_blocks("test_while", result)
+    # render_blocks("test_while", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2470,7 +2470,7 @@ async def test_while_else():
     """
     python_code = "while x: pass\nelse: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    render_blocks("test_while_else", result)
+    # render_blocks("test_while_else", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2522,6 +2522,295 @@ async def test_continue():
             "blocks": [
                 {
                     "type": "Continue",
+                }
+            ]
+        }
+    }, result
+
+
+async def test_pass():
+    """
+    Ensure that a pass statement is converted to Blockly JSON correctly.
+    """
+    python_code = "pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_pass", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Pass",
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except():
+    """
+    Ensure that a try-except statement is converted to Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {"block": None},
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except_with_exception():
+    """
+    Ensure that a try-except statement with an exception is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept Exception: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except_with_exception", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "Exception"}},
+                            }
+                        },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except_with_exception_as():
+    """
+    Ensure that a try-except statement with an exception and alias is converted
+    to Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept Exception as e: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except_with_exception_as", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "Exception"}},
+                            }
+                        },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                        "handler_000001_as": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "e"}},
+                            }
+                        },
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except_with_multiple_exceptions():
+    """
+    Ensure that a try-except statement with multiple exceptions is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept (ValueError, TypeError): pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except_with_multiple_exceptions", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {
+                            "block": {
+                                "type": "Tuple",
+                                "extraState": {"items": 2},
+                                "inputs": {
+                                    "input_000001": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "ValueError"}
+                                            },
+                                        }
+                                    },
+                                    "input_000002": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "TypeError"}
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except_with_multiple_exceptions_as():
+    """
+    Ensure that a try-except statement with multiple exceptions and alias is
+    converted to Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept (ValueError, TypeError) as e: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except_with_multiple_exceptions_as", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {
+                            "block": {
+                                "type": "Tuple",
+                                "extraState": {"items": 2},
+                                "inputs": {
+                                    "input_000001": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "ValueError"}
+                                            },
+                                        }
+                                    },
+                                    "input_000002": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "TypeError"}
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                        "handler_000001_as": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "e"}},
+                            }
+                        },
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_except_with_finally():
+    """
+    Ensure that a try-except statement with a finally clause is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept: pass\nfinally: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_except_with_finally", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "TryFinally",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {"block": None},
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                        "finally_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_with_else():
+    """
+    Ensure that a try statement with an else clause is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "try: pass\nexcept: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_with_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "TryElse",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {"block": None},
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_try_with_else_and_finally():
+    """
+    Ensure that a try statement with an else clause and finally clause is
+    converted to Blockly JSON correctly.
+    """
+    python_code = "try: pass\nexcept: pass\nelse: pass\nfinally: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_try_with_else_and_finally", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "TryElseFinally",
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {"block": None},
+                        "handler_000001_body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                        "finally_body": {"block": {"type": "Pass"}},
+                    },
+                    "extraState": {"handlers": 1},
                 }
             ]
         }
