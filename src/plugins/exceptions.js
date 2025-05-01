@@ -26,6 +26,7 @@ export function createTryBlock(hasElse=false, hasFinally=false) {
         },
 
         handlerCount_: 0,
+        tryStar_: false,
 
         saveExtraState: function() {
             if (!this.handlerCount_) {
@@ -35,11 +36,13 @@ export function createTryBlock(hasElse=false, hasFinally=false) {
             if (this.handlerCount_) {
               state['handlerCount'] = this.handlerCount_;
             }
+            state['tryStar'] = this.tryStar_;
             return state;        
         },
 
         loadExtraState: function (state) {
             const targetCount = state['handlerCount'] || 0;
+            this.tryStar_ = state['tryStar'] || false;
             this.updateShape_(targetCount);
         },        
 
@@ -65,9 +68,13 @@ export function createTryBlock(hasElse=false, hasFinally=false) {
 
             const count = this.handlerCount_.toString().padStart(6, '0');
 
-            this.appendValueInput(`handler_${count}`)
-                .appendField("except");
-            
+            if (this.tryStar_) {
+                this.appendValueInput(`handler_${count}`)
+                    .appendField("except*");
+            } else {
+                this.appendValueInput(`handler_${count}`)
+                    .appendField("except");
+            }   
             if (this.handlerCount_ > 1) {
                 this.appendDummyInput(`handler_${count}_colon`)
                     .appendField(":")

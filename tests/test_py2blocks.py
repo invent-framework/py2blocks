@@ -2613,6 +2613,7 @@ async def test_try_except_with_exception_as():
             "blocks": [
                 {
                     "type": "Try",
+                    "extraState": {"handlerCount": 1},
                     "inputs": {
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
@@ -2630,14 +2631,13 @@ async def test_try_except_with_exception_as():
                                     "name": {
                                         "block": {
                                             "type": "Name",
-                                            "fields": {"var": "e"},
+                                            "fields": {"var": {"name": "e"}},
                                         }
                                     },
                                 },
                             }
                         },
                     },
-                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2705,6 +2705,7 @@ async def test_try_except_with_multiple_exceptions_as():
             "blocks": [
                 {
                     "type": "Try",
+                    "extraState": {"handlerCount": 1},
                     "inputs": {
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
@@ -2742,14 +2743,13 @@ async def test_try_except_with_multiple_exceptions_as():
                                     "name": {
                                         "block": {
                                             "type": "Name",
-                                            "fields": {"var": "e"},
+                                            "fields": {"var": {"name": "e"}},
                                         }
                                     },
                                 },
                             }
                         },
                     },
-                    "extraState": {"handlerCount": 1},
                 }
             ]
         }
@@ -2829,6 +2829,50 @@ async def test_try_with_else_and_finally():
                         "finally_body": {"block": {"type": "Pass"}},
                     },
                     "extraState": {"handlerCount": 1},
+                }
+            ]
+        }
+    }, result
+
+
+async def test_trystar():
+    """
+    Ensure that a try statement using except* is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "try: pass\nexcept* Exception as e: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_trystar", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Try",
+                    "extraState": {"tryStar": True, "handlerCount": 1},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "handler_000001": {
+                            "block": {
+                                "type": "ExceptAs",
+                                "inputs": {
+                                    "type": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {
+                                                "var": {"name": "Exception"}
+                                            },
+                                        }
+                                    },
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "e"}},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
                 }
             ]
         }

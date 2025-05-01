@@ -737,13 +737,18 @@ def traverse_node(node):
             block["inputs"]["else_body"] = {
                 "block": traverse_body(node.orelse),
             }
-    elif isinstance(node, ast.Try):
+    elif isinstance(node, (ast.Try, ast.TryStar)):
+        block["type"] = "Try"
+        # If this is a TryStar, we need to add the extra state for the star
+        if isinstance(node, ast.TryStar):
+            block["extraState"] = {"tryStar": True}
+        else:
+            block["extraState"] = {}
         block["inputs"] = {
             "body": {
                 "block": traverse_body(node.body),
             },
         }
-        block["extraState"] = {}
         if node.orelse:
             block["type"] = "TryElse"
             block["inputs"]["else_body"] = {
@@ -774,7 +779,7 @@ def traverse_node(node):
                             "name": {
                                 "block": {
                                     "type": "Name",
-                                    "fields": {"var": handler.name},
+                                    "fields": {"var": {"name": handler.name}},
                                 }
                             },
                         },
