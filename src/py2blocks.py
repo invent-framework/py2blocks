@@ -809,9 +809,9 @@ def traverse_node(node):
                     }
                 }
             else:
-                block["inputs"][f"input_{i:06}"] = traverse_node(
-                    item.context_expr
-                )
+                block["inputs"][f"input_{i:06}"] = {
+                    "block": traverse_node(item.context_expr)
+                }
     elif isinstance(node, ast.FunctionDef):
         block["extraState"] = {
             "create_new_model": True,
@@ -866,9 +866,6 @@ def traverse_node(node):
                 "block": traverse_node(node.value),
             },
         }
-                block["inputs"][f"input_{i:06}"] = {
-                    "block": traverse_node(item.context_expr)
-                }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
