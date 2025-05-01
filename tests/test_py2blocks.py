@@ -2201,8 +2201,23 @@ async def test_import_as():
                     "inputs": {
                         "input_000001": {
                             "block": {
-                                "type": "alias",
-                                "fields": {"name": "os as operating_system"},
+                                "type": "AliasAs",
+                                "inputs": {
+                                    "name": {
+                                        "block": {
+                                            "type": "alias",
+                                            "fields": {"name": "os"},
+                                        }
+                                    },
+                                    "alias": {
+                                        "block": {
+                                            "type": "alias",
+                                            "fields": {
+                                                "name": "operating_system"
+                                            },
+                                        }
+                                    },
+                                },
                             }
                         }
                     },
@@ -2618,9 +2633,9 @@ async def test_try_except_with_exception_as():
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
                             "block": {
-                                "type": "ExceptAs",
+                                "type": "AliasAs",
                                 "inputs": {
-                                    "type": {
+                                    "name": {
                                         "block": {
                                             "type": "Name",
                                             "fields": {
@@ -2628,7 +2643,7 @@ async def test_try_except_with_exception_as():
                                             },
                                         }
                                     },
-                                    "name": {
+                                    "alias": {
                                         "block": {
                                             "type": "Name",
                                             "fields": {"var": {"name": "e"}},
@@ -2710,9 +2725,9 @@ async def test_try_except_with_multiple_exceptions_as():
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
                             "block": {
-                                "type": "ExceptAs",
+                                "type": "AliasAs",
                                 "inputs": {
-                                    "type": {
+                                    "name": {
                                         "block": {
                                             "type": "Tuple",
                                             "extraState": {"items": 2},
@@ -2740,7 +2755,7 @@ async def test_try_except_with_multiple_exceptions_as():
                                             },
                                         }
                                     },
-                                    "name": {
+                                    "alias": {
                                         "block": {
                                             "type": "Name",
                                             "fields": {"var": {"name": "e"}},
@@ -2853,9 +2868,9 @@ async def test_trystar():
                         "body": {"block": {"type": "Pass"}},
                         "handler_000001": {
                             "block": {
-                                "type": "ExceptAs",
+                                "type": "AliasAs",
                                 "inputs": {
-                                    "type": {
+                                    "name": {
                                         "block": {
                                             "type": "Name",
                                             "fields": {
@@ -2863,10 +2878,202 @@ async def test_trystar():
                                             },
                                         }
                                     },
-                                    "name": {
+                                    "alias": {
                                         "block": {
                                             "type": "Name",
                                             "fields": {"var": {"name": "e"}},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_with():
+    """
+    Ensure that a with statement is converted to Blockly JSON correctly.
+    """
+    python_code = "with x: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_with", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "With",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "input_000001": {
+                            "type": "Name",
+                            "fields": {"var": {"name": "x"}},
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_with_as():
+    """
+    Ensure that a with statement with as is converted to Blockly JSON correctly.
+    """
+    python_code = "with x as y: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_with_as", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "With",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "input_000001": {
+                            "block": {
+                                "type": "AliasAs",
+                                "inputs": {
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "alias": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "y"}},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_with_as_multiple():
+    """
+    Ensure that a with statement with multiple as is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "with x as (y, z): pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_with_as_multiple", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "With",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "input_000001": {
+                            "block": {
+                                "type": "AliasAs",
+                                "inputs": {
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "alias": {
+                                        "block": {
+                                            "type": "Tuple",
+                                            "extraState": {"items": 2},
+                                            "inputs": {
+                                                "input_000001": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "y"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                                "input_000002": {
+                                                    "block": {
+                                                        "type": "Name",
+                                                        "fields": {
+                                                            "var": {
+                                                                "name": "z"
+                                                            }
+                                                        },
+                                                    }
+                                                },
+                                            },
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_with_multiple_as():
+    """
+    Ensure that a with statement with multiple as is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "with a as b, c as d: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_with_multiple_as", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "With",
+                    "extraState": {"items": 2},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "input_000001": {
+                            "block": {
+                                "type": "AliasAs",
+                                "inputs": {
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "a"}},
+                                        }
+                                    },
+                                    "alias": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "b"}},
+                                        }
+                                    },
+                                },
+                            }
+                        },
+                        "input_000002": {
+                            "block": {
+                                "type": "AliasAs",
+                                "inputs": {
+                                    "name": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "c"}},
+                                        }
+                                    },
+                                    "alias": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "d"}},
                                         }
                                     },
                                 },

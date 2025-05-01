@@ -52,3 +52,17 @@ const Continue = {
   }
 };
 Blockly.common.defineBlocks({Continue: Continue});
+
+
+const AliasAs = {
+  init: function() {
+    this.appendValueInput('name');
+    this.appendDummyInput('')
+      .appendField('as');
+    this.appendValueInput('alias');
+    this.setInputsInline(true)
+    this.setOutput(true, null);
+    this.setColour(225);
+  }
+};
+Blockly.common.defineBlocks({AliasAs: AliasAs});

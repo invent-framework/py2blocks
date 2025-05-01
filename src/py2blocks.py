@@ -667,15 +667,36 @@ def traverse_node(node):
             }
     elif isinstance(node, ast.alias):
         block["fields"] = {"name": node.name}
-        if node.asname:
-            block["fields"] = {"name": f"{node.name} as {node.asname}"}
     elif isinstance(node, ast.Import):
         block["extraState"] = {"items": len(node.names)}
         block["inputs"] = {}
         for i, alias in enumerate(node.names, start=1):
-            block["inputs"][f"input_{i:06}"] = {
-                "block": traverse_node(alias),
-            }
+            if alias.asname:
+                # import a as b
+                block["inputs"][f"input_{i:06}"] = {
+                    "block": {
+                        "type": "AliasAs",
+                        "inputs": {
+                            "name": {
+                                "block": {
+                                    "type": "alias",
+                                    "fields": {"name": alias.name},
+                                }
+                            },
+                            "alias": {
+                                "block": {
+                                    "type": "alias",
+                                    "fields": {"name": alias.asname},
+                                }
+                            },
+                        },
+                    }
+                }
+            else:
+                # import a
+                block["inputs"][f"input_{i:06}"] = {
+                    "block": traverse_node(alias),
+                }
     elif isinstance(node, ast.ImportFrom):
         block["fields"] = {"module": node.module}
         block["extraState"] = {"items": len(node.names)}
@@ -771,12 +792,12 @@ def traverse_node(node):
             if handler.name:
                 block["inputs"][f"handler_{i:06}"] = {
                     "block": {
-                        "type": "ExceptAs",
+                        "type": "AliasAs",
                         "inputs": {
-                            "type": {
+                            "name": {
                                 "block": traverse_node(handler.type),
                             },
-                            "name": {
+                            "alias": {
                                 "block": {
                                     "type": "Name",
                                     "fields": {"var": {"name": handler.name}},
@@ -794,6 +815,32 @@ def traverse_node(node):
                 }
 
         block["extraState"]["handlerCount"] = len(node.handlers)
+    elif isinstance(node, ast.With):
+        block["extraState"] = {"items": len(node.items)}
+        block["inputs"] = {
+            "body": {
+                "block": traverse_body(node.body),
+            },
+        }
+        for i, item in enumerate(node.items, start=1):
+            if item.optional_vars:
+                block["inputs"][f"input_{i:06}"] = {
+                    "block": {
+                        "type": "AliasAs",
+                        "inputs": {
+                            "name": {
+                                "block": traverse_node(item.context_expr),
+                            },
+                            "alias": {
+                                "block": traverse_node(item.optional_vars),
+                            },
+                        },
+                    }
+                }
+            else:
+                block["inputs"][f"input_{i:06}"] = traverse_node(
+                    item.context_expr
+                )
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
