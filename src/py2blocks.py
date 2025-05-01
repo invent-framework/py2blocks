@@ -837,20 +837,22 @@ def traverse_node(node):
         }
     elif isinstance(node, ast.Lambda):
         block["extraState"] = {"items": len(node.args.args)}
-        block["inputs"] = {"body": traverse_node(node.body)}
+        block["inputs"] = {"body": {"block": traverse_node(node.body)}}
         # Iterate over args and create an Argument block within the corresponding input
         for i, arg in enumerate(node.args.args, start=1):
             if node.args.defaults:
                 # If there are defaults, we need to create a default block
                 block["inputs"][f"arg_{i:06}"] = {
                     "block": {
-                        "type": "ArgumentWithDefault",
-                        "fields": {"name": arg.arg},
-                    }
-                }
-                block["inputs"][f"arg_{i:06}"]["block"]["inputs"] = {
-                    "default": {
-                        "block": traverse_node(node.args.defaults[i - 1]),
+                        "type": "keyword",
+                        "fields": {"arg": arg.arg},
+                        "inputs": {
+                            "value": {
+                                "block": traverse_node(
+                                    node.args.defaults[i - 1]
+                                ),
+                            }
+                        },
                     }
                 }
             else:

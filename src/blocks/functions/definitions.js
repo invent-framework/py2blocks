@@ -1,4 +1,5 @@
 import { setDuplicateOnDragStrategy } from "../../plugins/drag-strategy/drag-strategy.js";
+import { createLambdaBlock } from "../../plugins/functions.js";
 
 const functionsColor = "#ff99aa";
 
@@ -262,3 +263,5 @@ const AssertWithMsg = {
 	}
   };
 Blockly.common.defineBlocks({AssertWithMsg: AssertWithMsg});  
+
+Blockly.Blocks["Lambda"] = createLambdaBlock();

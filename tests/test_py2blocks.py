@@ -3098,7 +3098,7 @@ async def test_lambda_no_args():
     """
     python_code = "lambda: x"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_lambda_no_args", result)
+    render_blocks("test_lambda_no_args", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -3107,8 +3107,10 @@ async def test_lambda_no_args():
                     "extraState": {"items": 0},
                     "inputs": {
                         "body": {
-                            "type": "Name",
-                            "fields": {"var": {"name": "x"}},
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
                         }
                     },
                 }
@@ -3124,7 +3126,7 @@ async def test_lambda_one_arg():
     """
     python_code = "lambda x: x"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_lambda_one_arg", result)
+    render_blocks("test_lambda_one_arg", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -3133,8 +3135,10 @@ async def test_lambda_one_arg():
                     "extraState": {"items": 1},
                     "inputs": {
                         "body": {
-                            "type": "Name",
-                            "fields": {"var": {"name": "x"}},
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
                         },
                         "arg_000001": {
                             "block": {"type": "alias", "fields": {"name": "x"}}
@@ -3153,7 +3157,7 @@ async def test_lambda_multiple_args():
     """
     python_code = "lambda x, y: x + y"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_lambda_multiple_args", result)
+    render_blocks("test_lambda_multiple_args", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -3162,22 +3166,24 @@ async def test_lambda_multiple_args():
                     "extraState": {"items": 2},
                     "inputs": {
                         "body": {
-                            "type": "BinOp",
-                            "inputs": {
-                                "left": {
-                                    "block": {
-                                        "type": "Name",
-                                        "fields": {"var": {"name": "x"}},
-                                    }
+                            "block": {
+                                "type": "BinOp",
+                                "inputs": {
+                                    "left": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "x"}},
+                                        }
+                                    },
+                                    "right": {
+                                        "block": {
+                                            "type": "Name",
+                                            "fields": {"var": {"name": "y"}},
+                                        }
+                                    },
                                 },
-                                "right": {
-                                    "block": {
-                                        "type": "Name",
-                                        "fields": {"var": {"name": "y"}},
-                                    }
-                                },
-                            },
-                            "fields": {"op": "Add"},
+                                "fields": {"op": "Add"},
+                            }
                         },
                         "arg_000001": {
                             "block": {"type": "alias", "fields": {"name": "x"}}
@@ -3199,7 +3205,7 @@ async def test_lambda_with_default():
     """
     python_code = "lambda x=1: x"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_lambda_with_default", result)
+    render_blocks("test_lambda_with_default", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -3208,12 +3214,14 @@ async def test_lambda_with_default():
                     "extraState": {"items": 1},
                     "inputs": {
                         "body": {
-                            "type": "Name",
-                            "fields": {"var": {"name": "x"}},
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
                         },
                         "arg_000001": {
                             "block": {
-                                "type": "ArgumentWithDefault",
+                                "type": "keyword",
                                 "fields": {"name": "x"},
                                 "inputs": {
                                     "default": {
