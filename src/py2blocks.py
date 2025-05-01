@@ -363,35 +363,6 @@ def traverse_node(node):
         return node
     elif isinstance(node, (ast.Pass, ast.Break, ast.Continue)):
         return block
-    elif isinstance(node, ast.FunctionDef):
-        block["extraState"] = {
-            "create_new_model": True,
-            "name": node.name,
-            "args": [{"name": arg.arg} for arg in node.args.args],
-        }
-        block["inputs"] = {"body": {}}
-        body = traverse_body(node.body)
-        if body:
-            block["inputs"]["body"]["block"] = body
-        # Iterate over args and create an Argument block within the corresponding input
-        for i, arg in enumerate(node.args.args, start=1):
-            block["inputs"][f"arg_{i:06}"] = {
-                "block": {
-                    "type": "Argument",
-                    "fields": {"name": arg.arg},
-                }
-            }
-        # Register the function for later use. TODO: FIXME for nested functions.
-        USER_DEFINED_FUNCTIONS[node.name] = {
-            "function_name": node.name,
-            "args": [{"name": arg.arg} for arg in node.args.args],
-        }
-    elif isinstance(node, ast.Return):
-        block["inputs"] = {
-            "value": {
-                "block": traverse_node(node.value),
-            },
-        }
     elif isinstance(node, ast.Constant):
         block["type"] = type(node.value).__name__
         if isinstance(node.value, bool):
@@ -841,6 +812,60 @@ def traverse_node(node):
                 block["inputs"][f"input_{i:06}"] = traverse_node(
                     item.context_expr
                 )
+    elif isinstance(node, ast.FunctionDef):
+        block["extraState"] = {
+            "create_new_model": True,
+            "name": node.name,
+            "args": [{"name": arg.arg} for arg in node.args.args],
+        }
+        block["inputs"] = {"body": {}}
+        body = traverse_body(node.body)
+        if body:
+            block["inputs"]["body"]["block"] = body
+        # Iterate over args and create an Argument block within the corresponding input
+        for i, arg in enumerate(node.args.args, start=1):
+            block["inputs"][f"arg_{i:06}"] = {
+                "block": {
+                    "type": "Argument",
+                    "fields": {"name": arg.arg},
+                }
+            }
+        # Register the function for later use. TODO: FIXME for nested functions.
+        USER_DEFINED_FUNCTIONS[node.name] = {
+            "function_name": node.name,
+            "args": [{"name": arg.arg} for arg in node.args.args],
+        }
+    elif isinstance(node, ast.Lambda):
+        block["extraState"] = {"items": len(node.args.args)}
+        block["inputs"] = {"body": traverse_node(node.body)}
+        # Iterate over args and create an Argument block within the corresponding input
+        for i, arg in enumerate(node.args.args, start=1):
+            if node.args.defaults:
+                # If there are defaults, we need to create a default block
+                block["inputs"][f"arg_{i:06}"] = {
+                    "block": {
+                        "type": "ArgumentWithDefault",
+                        "fields": {"name": arg.arg},
+                    }
+                }
+                block["inputs"][f"arg_{i:06}"]["block"]["inputs"] = {
+                    "default": {
+                        "block": traverse_node(node.args.defaults[i - 1]),
+                    }
+                }
+            else:
+                block["inputs"][f"arg_{i:06}"] = {
+                    "block": {
+                        "type": "alias",
+                        "fields": {"name": arg.arg},
+                    }
+                }
+    elif isinstance(node, ast.Return):
+        block["inputs"] = {
+            "value": {
+                "block": traverse_node(node.value),
+            },
+        }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

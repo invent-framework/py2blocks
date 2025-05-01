@@ -3084,3 +3084,144 @@ async def test_with_multiple_as():
             ]
         }
     }, result
+
+
+async def test_lambda_no_args():
+    """
+    Ensure that a lambda function with no arguments is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "lambda: x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_lambda_no_args", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Lambda",
+                    "extraState": {"items": 0},
+                    "inputs": {
+                        "body": {
+                            "type": "Name",
+                            "fields": {"var": {"name": "x"}},
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_lambda_one_arg():
+    """
+    Ensure that a lambda function with one argument is converted to Blockly JSON
+    correctly.
+    """
+    python_code = "lambda x: x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_lambda_one_arg", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Lambda",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {
+                            "type": "Name",
+                            "fields": {"var": {"name": "x"}},
+                        },
+                        "arg_000001": {
+                            "block": {"type": "alias", "fields": {"name": "x"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_lambda_multiple_args():
+    """
+    Ensure that a lambda function with multiple arguments is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "lambda x, y: x + y"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_lambda_multiple_args", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Lambda",
+                    "extraState": {"items": 2},
+                    "inputs": {
+                        "body": {
+                            "type": "BinOp",
+                            "inputs": {
+                                "left": {
+                                    "block": {
+                                        "type": "Name",
+                                        "fields": {"var": {"name": "x"}},
+                                    }
+                                },
+                                "right": {
+                                    "block": {
+                                        "type": "Name",
+                                        "fields": {"var": {"name": "y"}},
+                                    }
+                                },
+                            },
+                            "fields": {"op": "Add"},
+                        },
+                        "arg_000001": {
+                            "block": {"type": "alias", "fields": {"name": "x"}}
+                        },
+                        "arg_000002": {
+                            "block": {"type": "alias", "fields": {"name": "y"}}
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_lambda_with_default():
+    """
+    Ensure that a lambda function with a default argument is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "lambda x=1: x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    # render_blocks("test_lambda_with_default", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Lambda",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {
+                            "type": "Name",
+                            "fields": {"var": {"name": "x"}},
+                        },
+                        "arg_000001": {
+                            "block": {
+                                "type": "ArgumentWithDefault",
+                                "fields": {"name": "x"},
+                                "inputs": {
+                                    "default": {
+                                        "block": {
+                                            "type": "int",
+                                            "fields": {"value": 1},
+                                        }
+                                    }
+                                },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
