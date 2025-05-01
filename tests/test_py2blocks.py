@@ -3230,4 +3230,3 @@ async def test_lambda_with_default():
             ]
         }
     }, result
-
