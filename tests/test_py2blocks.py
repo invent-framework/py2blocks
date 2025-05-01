@@ -2652,6 +2652,7 @@ async def test_try_except_with_exception_as():
                                 },
                             }
                         },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
                     },
                 }
             ]
@@ -2764,6 +2765,7 @@ async def test_try_except_with_multiple_exceptions_as():
                                 },
                             }
                         },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
                     },
                 }
             ]
@@ -2887,6 +2889,7 @@ async def test_trystar():
                                 },
                             }
                         },
+                        "handler_000001_body": {"block": {"type": "Pass"}},
                     },
                 }
             ]
@@ -2900,7 +2903,7 @@ async def test_with():
     """
     python_code = "with x: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_with", result)
+    render_blocks("test_with", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2910,8 +2913,10 @@ async def test_with():
                     "inputs": {
                         "body": {"block": {"type": "Pass"}},
                         "input_000001": {
-                            "type": "Name",
-                            "fields": {"var": {"name": "x"}},
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
                         },
                     },
                 }
@@ -2926,7 +2931,7 @@ async def test_with_as():
     """
     python_code = "with x as y: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_with_as", result)
+    render_blocks("test_with_as", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -2968,7 +2973,7 @@ async def test_with_as_multiple():
     """
     python_code = "with x as (y, z): pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_with_as_multiple", result)
+    render_blocks("test_with_as_multiple", result)
     assert result == {
         "blocks": {
             "blocks": [
@@ -3032,7 +3037,7 @@ async def test_with_multiple_as():
     """
     python_code = "with a as b, c as d: pass"
     result = json.loads(py2blocks.py2blocks(python_code))
-    # render_blocks("test_with_multiple_as", result)
+    render_blocks("test_with_multiple_as", result)
     assert result == {
         "blocks": {
             "blocks": [

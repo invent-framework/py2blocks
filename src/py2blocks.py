@@ -810,9 +810,9 @@ def traverse_node(node):
                 block["inputs"][f"handler_{i:06}"] = {
                     "block": traverse_node(handler.type),
                 }
-                block["inputs"][f"handler_{i:06}_body"] = {
-                    "block": traverse_body(handler.body),
-                }
+            block["inputs"][f"handler_{i:06}_body"] = {
+                "block": traverse_body(handler.body),
+            }
 
         block["extraState"]["handlerCount"] = len(node.handlers)
     elif isinstance(node, ast.With):
@@ -838,9 +838,9 @@ def traverse_node(node):
                     }
                 }
             else:
-                block["inputs"][f"input_{i:06}"] = traverse_node(
-                    item.context_expr
-                )
+                block["inputs"][f"input_{i:06}"] = {
+                    "block": traverse_node(item.context_expr)
+                }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)
