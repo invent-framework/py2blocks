@@ -862,12 +862,22 @@ def traverse_node(node):
                         "fields": {"name": arg.arg},
                     }
                 }
-    elif isinstance(node, ast.Return):
+    elif isinstance(node, (ast.Return, ast.Yield, ast.YieldFrom)):
         block["inputs"] = {
             "value": {
                 "block": traverse_node(node.value),
             },
         }
+    elif isinstance(node, (ast.Global, ast.Nonlocal)):
+        block["extraState"] = {"items": len(node.names)}
+        block["inputs"] = {}
+        for i, name in enumerate(node.names, start=1):
+            block["inputs"][f"input_{i:06}"] = {
+                "block": {
+                    "type": "Name",
+                    "fields": {"var": {"name": name}},
+                }
+            }
     elif isinstance(node, ast.Call):
         # Get the function identifier (could be simple name or module.function)
         function_key = get_function_key(node)

@@ -1,3 +1,6 @@
+import { createPlusMinusBlock } from "../../plugins/plus-minus.js";
+
+
 const catch_all = {
     init: function() {
       this.appendDummyInput()
@@ -66,3 +69,7 @@ const AliasAs = {
   }
 };
 Blockly.common.defineBlocks({AliasAs: AliasAs});
+
+
+Blockly.Blocks["Global"] = createPlusMinusBlock("global", "", "Name", ["Name"]);
+Blockly.Blocks["Nonlocal"] = createPlusMinusBlock("nonlocal", "", "Name", ["Name"]);

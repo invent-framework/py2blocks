@@ -186,6 +186,31 @@ const Return = {
 };
 Blockly.common.defineBlocks({Return: Return});
 
+  
+const Yield = {
+	init: function() {
+	  this.appendDummyInput()
+		.appendField('yield');
+	  this.appendValueInput('value');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({Yield: Yield});
+
+const YieldFrom = {
+	init: function() {
+	  this.appendDummyInput()
+		.appendField('yield from');
+	  this.appendValueInput('value');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({YieldFrom: YieldFrom});
+
 const keyword = {
 	init: function() {
 	  this.appendDummyInput()

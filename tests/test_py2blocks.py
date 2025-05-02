@@ -3222,15 +3222,171 @@ async def test_lambda_with_default():
                         "arg_000001": {
                             "block": {
                                 "type": "keyword",
-                                "fields": {"name": "x"},
+                                "fields": {"arg": "x"},
                                 "inputs": {
-                                    "default": {
+                                    "value": {
                                         "block": {
                                             "type": "int",
                                             "fields": {"value": 1},
                                         }
                                     }
                                 },
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_return():
+    """
+    Ensure that a return statement is converted to Blockly JSON correctly.
+    """
+    python_code = "return x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_return", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Return",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_yield():
+    """
+    Ensure that a yield statement is converted to Blockly JSON correctly.
+    """
+    python_code = "yield x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_yield", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Yield",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_yield_from():
+    """
+    Ensure that a yield from statement is converted to Blockly JSON correctly.
+    """
+    python_code = "yield from x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_yield_from", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "YieldFrom",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_global():
+    """
+    Ensure that a global statement is converted to Blockly JSON correctly.
+    """
+    python_code = "global x, y, z"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_global", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Global",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "input_000002": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "input_000003": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "z"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_nonlocal():
+    """
+    Ensure that a nonlocal statement is converted to Blockly JSON correctly.
+    """
+    python_code = "nonlocal x, y, z"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_nonlocal", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Nonlocal",
+                    "extraState": {"items": 3},
+                    "inputs": {
+                        "input_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "input_000002": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "input_000003": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "z"}},
                             }
                         },
                     },
