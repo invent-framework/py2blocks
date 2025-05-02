@@ -3394,3 +3394,31 @@ async def test_nonlocal():
             ]
         }
     }, result
+
+
+async def test_class():
+    """
+    Ensure that a class statement is converted to Blockly JSON correctly.
+    """
+    python_code = "class MyClass:\n    pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_class", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "ClassDef",
+                    "extraState": {"bases": 0, "keywords": 0, "decorators": 0},
+                    "inputs": {
+                        "name": {
+                            "block": {
+                                "type": "alias",
+                                "fields": {"name": "MyClass"},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result

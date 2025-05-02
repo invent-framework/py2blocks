@@ -290,3 +290,18 @@ const AssertWithMsg = {
 Blockly.common.defineBlocks({AssertWithMsg: AssertWithMsg});  
 
 Blockly.Blocks["Lambda"] = createLambdaBlock();
+
+const ClassDef = {
+    init: function() {
+      this.appendValueInput('name')
+        .appendField('class');
+	  this.appendDummyInput()
+		.appendField(':');
+      this.appendStatementInput('body');
+      this.setInputsInline(true)
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.setColour("#aabbcc");
+    }
+};
+Blockly.common.defineBlocks({ClassDef: ClassDef});

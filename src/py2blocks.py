@@ -958,6 +958,23 @@ def traverse_node(node):
                     }
         else:
             block = catch_all(node, block)
+    elif isinstance(node, ast.ClassDef):
+        block["extraState"] = {
+            "bases": len(node.bases),
+            "keywords": len(node.keywords),
+            "decorators": len(node.decorator_list),
+        }
+        block["inputs"] = {
+            "name": {
+                "block": {
+                    "type": "alias",
+                    "fields": {"name": node.name},
+                }
+            },
+            "body": {
+                "block": traverse_body(node.body),
+            },
+        }
     else:
         block = catch_all(node, block)
     return block
