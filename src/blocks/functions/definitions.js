@@ -3,93 +3,104 @@ import { createLambdaBlock } from "../../plugins/functions.js";
 
 const functionsColor = "#ff99aa";
 
-const FunctionDef = {
-	init: function() {
-		this.appendDummyInput()
-			.appendField("def")
-			.appendField(new Blockly.FieldLabel(""), "name");
-		this.setInputsInline(true);
-		this.setPreviousStatement(true, null);
-		this.setNextStatement(true, null);
-		this.setColour("#ff99aa");
-		this.model = new ObservableProcedureModel(this.workspace, "");
-		this.workspace.getProcedureMap().add(this.model);
-	},
-
-	destroy: function() {
-		if (this.isInsertionMarker()) {
-			return;
-		}
-		this.workspace.getProcedureMap().delete(this.model.getId());
-	},
-
-	doProcedureUpdate: function() {
-		this.setFieldValue(this.model.getName(), "name");
-
-		const args = this.model.getParameters();
-
-		if (args.length > 0) {
+function createFunctionBlock(is_async=false) {
+	return {
+		init: function() {
+			if (is_async) {
+				this.appendDummyInput()
+					.appendField("async");
+			}
 			this.appendDummyInput()
-				.appendField("(");	
-
-			args.forEach((arg, index) => {
-				index = index + 1;
-				index = index.toString().padStart(6, '0');
-				if (index > 1) {
-					this.appendValueInput(`arg_${index}`)
-						.appendField(",");
-				}
-				else {
-					this.appendValueInput(`arg_${index}`);
-				}
-			});
-
-			this.appendDummyInput()
-				.appendField("):");	
-		}
-		else {
-			this.appendDummyInput()
-				.appendField("():");		
-		}
-
-		this.appendStatementInput("body");
-	},
-
-	saveExtraState(doFullSerialization) {
-		const state = {
-			"procedureId": this.model.getId()
-		};
-
-		if (doFullSerialization) {
-			state["name"] = this.model.getName();
-			state["args"] = this.model.getParameters().map((arg) => {
-				return { name: arg.getName(), id: arg.getId() };
-			});
-			state["create_new_model"] = true;
-		}
-		
-		return state;
-	},
-
-	loadExtraState(state) {
-		const id = state["procedureId"];
-		const map = this.workspace.getProcedureMap();
+				.appendField("def")
+				.appendField(new Blockly.FieldLabel(""), "name");
+			
+			this.setInputsInline(true);
+			this.setPreviousStatement(true, null);
+			this.setNextStatement(true, null);
+			this.setColour("#ff99aa");
+			this.model = new ObservableProcedureModel(this.workspace, "");
+			this.workspace.getProcedureMap().add(this.model);
+		},
 	
-		if (map.has(id) && !state["create_new_model"]) {
-			map.delete(this.model.getId());
-			this.model = map.get(id);
+		destroy: function() {
+			if (this.isInsertionMarker()) {
+				return;
+			}
+			this.workspace.getProcedureMap().delete(this.model.getId());
+		},
+	
+		doProcedureUpdate: function() {
+			this.setFieldValue(this.model.getName(), "name");
+	
+			const args = this.model.getParameters();
+	
+			if (args.length > 0) {
+				this.appendDummyInput()
+					.appendField("(");	
+	
+				args.forEach((arg, index) => {
+					index = index + 1;
+					index = index.toString().padStart(6, '0');
+					if (index > 1) {
+						this.appendValueInput(`arg_${index}`)
+							.appendField(",");
+					}
+					else {
+						this.appendValueInput(`arg_${index}`);
+					}
+				});
+	
+				this.appendDummyInput()
+					.appendField("):");	
+			}
+			else {
+				this.appendDummyInput()
+					.appendField("():");		
+			}
+	
+			this.appendStatementInput("body");
+		},
+	
+		saveExtraState(doFullSerialization) {
+			const state = {
+				"procedureId": this.model.getId()
+			};
+	
+			if (doFullSerialization) {
+				state["name"] = this.model.getName();
+				state["args"] = this.model.getParameters().map((arg) => {
+					return { name: arg.getName(), id: arg.getId() };
+				});
+				state["create_new_model"] = true;
+			}
+			
+			return state;
+		},
+	
+		loadExtraState(state) {
+			const id = state["procedureId"];
+			const map = this.workspace.getProcedureMap();
+		
+			if (map.has(id) && !state["create_new_model"]) {
+				map.delete(this.model.getId());
+				this.model = map.get(id);
+				this.doProcedureUpdate();
+				return;
+			}
+	
+			this.model.setName(state["name"]);
+			state["args"].forEach((arg) => {
+				this.model.insertParameter(new ObservableParameterModel(this.workspace, arg["name"]));
+			});
 			this.doProcedureUpdate();
-			return;
 		}
+	};
+}
 
-		this.model.setName(state["name"]);
-		state["args"].forEach((arg) => {
-			this.model.insertParameter(new ObservableParameterModel(this.workspace, arg["name"]));
-		});
-		this.doProcedureUpdate();
-	}
-};
+const FunctionDef = createFunctionBlock();
+const AsyncFunctionDef = createFunctionBlock(true);
 Blockly.common.defineBlocks({FunctionDef: FunctionDef});
+Blockly.common.defineBlocks({AsyncFunctionDef: AsyncFunctionDef});
 
 // TODO: Add support for inline function definitions & predefined procedure models
 const Call = {
@@ -210,6 +221,19 @@ const YieldFrom = {
 	}
 };
 Blockly.common.defineBlocks({YieldFrom: YieldFrom});
+
+
+const Await = {
+	init: function() {
+	  this.appendDummyInput()
+		.appendField('await');
+	  this.appendValueInput('value');
+	  this.setInputsInline(true)
+	  this.setPreviousStatement(true, null);
+	  this.setColour(functionsColor);
+	}
+};
+Blockly.common.defineBlocks({Await: Await});
 
 const keyword = {
 	init: function() {

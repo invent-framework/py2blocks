@@ -3422,3 +3422,149 @@ async def test_class():
             ]
         }
     }, result
+
+
+async def test_await():
+    """
+    Ensure that an await statement is converted to Blockly JSON correctly.
+    """
+    python_code = "await x"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_await", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "Await",
+                    "inputs": {
+                        "value": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        }
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_async_for():
+    """
+    Ensure that an async for statement is converted to Blockly JSON correctly.
+    """
+    python_code = "async for x in y: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_async_for", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "AsyncFor",
+                    "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_async_for_else():
+    """
+    Ensure that an async for statement with an else clause is converted to
+    Blockly JSON correctly.
+    """
+    python_code = "async for x in y: pass\nelse: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_async_for_else", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "AsyncForElse",
+                    "inputs": {
+                        "target": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                        "iter": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "y"}},
+                            }
+                        },
+                        "body": {"block": {"type": "Pass"}},
+                        "else_body": {"block": {"type": "Pass"}},
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+async def test_async_with():
+    """
+    Ensure that an async with statement is converted to Blockly JSON correctly.
+    """
+    python_code = "async with x: pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_async_with", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "AsyncWith",
+                    "extraState": {"items": 1},
+                    "inputs": {
+                        "body": {"block": {"type": "Pass"}},
+                        "input_000001": {
+                            "block": {
+                                "type": "Name",
+                                "fields": {"var": {"name": "x"}},
+                            }
+                        },
+                    },
+                }
+            ]
+        }
+    }, result
+
+
+def test_async_def():
+    """
+    Ensure that an async def statement is converted to Blockly JSON correctly.
+    """
+    python_code = "async def my_func(): pass"
+    result = json.loads(py2blocks.py2blocks(python_code))
+    render_blocks("test_async_def", result)
+    assert result == {
+        "blocks": {
+            "blocks": [
+                {
+                    "type": "AsyncFunctionDef",
+                    "extraState": {
+                        "create_new_model": True,
+                        "name": "my_func",
+                        "args": [],
+                    },
+                    "inputs": {"body": {"block": {"type": "Pass"}}},
+                }
+            ]
+        }
+    }, result

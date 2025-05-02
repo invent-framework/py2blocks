@@ -698,7 +698,7 @@ def traverse_node(node):
                 ]
             )
             block["extraState"]["hasElse"] = "else_body" in inputs
-    elif isinstance(node, ast.For):
+    elif isinstance(node, (ast.For, ast.AsyncFor)):
         block["inputs"] = {
             "target": {
                 "block": traverse_node(node.target),
@@ -711,7 +711,9 @@ def traverse_node(node):
             },
         }
         if node.orelse:
-            block["type"] = "ForElse"
+            block["type"] = (
+                "ForElse" if isinstance(node, ast.For) else "AsyncForElse"
+            )
             block["inputs"]["else_body"] = {
                 "block": traverse_body(node.orelse),
             }
@@ -786,7 +788,7 @@ def traverse_node(node):
             }
 
         block["extraState"]["handlerCount"] = len(node.handlers)
-    elif isinstance(node, ast.With):
+    elif isinstance(node, (ast.With, ast.AsyncWith)):
         block["extraState"] = {"items": len(node.items)}
         block["inputs"] = {
             "body": {
@@ -812,7 +814,7 @@ def traverse_node(node):
                 block["inputs"][f"input_{i:06}"] = {
                     "block": traverse_node(item.context_expr)
                 }
-    elif isinstance(node, ast.FunctionDef):
+    elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
         block["extraState"] = {
             "create_new_model": True,
             "name": node.name,
@@ -862,7 +864,7 @@ def traverse_node(node):
                         "fields": {"name": arg.arg},
                     }
                 }
-    elif isinstance(node, (ast.Return, ast.Yield, ast.YieldFrom)):
+    elif isinstance(node, (ast.Return, ast.Yield, ast.YieldFrom, ast.Await)):
         block["inputs"] = {
             "value": {
                 "block": traverse_node(node.value),

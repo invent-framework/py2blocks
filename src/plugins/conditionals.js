@@ -179,11 +179,16 @@ export function createIfBlock() {
     }
 }
 
-export function createWithBlock() {
+export function createWithBlock(is_async=false) {
     return {
         init: function() {
-            this.appendDummyInput()
-                .appendField("with");
+            if (is_async) {
+                this.appendDummyInput()
+                    .appendField("async with");
+            } else {
+                this.appendDummyInput()
+                    .appendField("with");
+            }
             this.setPreviousStatement(true);
             this.setNextStatement(true);
             this.setInputsInline(true);
